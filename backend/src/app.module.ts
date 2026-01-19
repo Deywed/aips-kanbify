@@ -1,9 +1,28 @@
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { createTypeOrmOptions } from './database/typeorm.config';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
+import { JwtGlobalModule } from './jwt/jwt.module';
+import { AuthModule } from './auth/auth.module';
+
 @Module({
-  imports: [],
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+      isGlobal: true,
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) =>
+        createTypeOrmOptions(configService),
+    }),
+    JwtGlobalModule,
+    AuthModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
