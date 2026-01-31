@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 
 import { BoardMember } from 'src/board-members/entity/board-members.entity';
+import { BoardColumn } from 'src/board-column/entity/board-column.entity';
 
 @Entity('boards')
 export class Board {
@@ -25,4 +26,7 @@ export class Board {
 
   @OneToMany(() => BoardMember, (bm) => bm.board)
   members: BoardMember[];
+
+  @OneToMany(() => BoardColumn, (col) => col.board)
+  columns: BoardColumn[];
 }

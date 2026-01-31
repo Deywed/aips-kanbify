@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 
 import { BoardMember } from 'src/board-members/entity/board-members.entity';
+import { Notification } from 'src/notifications/entity/notifications.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -46,4 +47,7 @@ export class User {
 
   @OneToMany(() => BoardMember, (bm) => bm.user)
   memberships: BoardMember[];
+
+  @OneToMany(() => Notification, (n) => n.user)
+  notifications: Notification[];
 }
