@@ -3,9 +3,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { createTypeOrmOptions } from './database/typeorm.config';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-
 import { JwtGlobalModule } from './jwt/jwt.module';
 import { AuthModule } from './auth/auth.module';
 
@@ -23,7 +20,7 @@ import { AuthModule } from './auth/auth.module';
     JwtGlobalModule,
     AuthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
