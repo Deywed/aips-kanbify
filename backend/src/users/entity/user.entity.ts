@@ -2,9 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+import { BoardMember } from 'src/board-members/entity/board-members.entity';
+import { Notification } from 'src/notifications/entity/notifications.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -40,4 +44,10 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => BoardMember, (bm) => bm.user)
+  memberships: BoardMember[];
+
+  @OneToMany(() => Notification, (n) => n.user)
+  notifications: Notification[];
 }
