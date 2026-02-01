@@ -37,6 +37,7 @@ export class BoardService {
       // Create board
       const board = queryRunner.manager.create(Board, {
         title: dto.title,
+        description: dto.description,
       });
 
       await queryRunner.manager.save(board);
