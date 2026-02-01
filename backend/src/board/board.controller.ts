@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -46,5 +47,11 @@ export class BoardController {
     @Body() dto: UpdateBoardDto,
   ) {
     return this.boardService.updateBoard(boardId, dto);
+  }
+
+  @Get()
+  getBoardsForUser(@Req() req: Request) {
+    const user = req['user'] as JwtPayload;
+    return this.boardService.getBoardsForUser(user.sub);
   }
 }

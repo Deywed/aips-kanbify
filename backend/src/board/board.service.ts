@@ -99,4 +99,18 @@ export class BoardService {
       id: boardId,
     };
   }
+
+  async getBoardsForUser(userId: string) {
+    const memberships = await this.memberRepo.find({
+      where: {
+        user: { id: userId },
+      },
+      relations: ['board'],
+    });
+
+    return memberships.map((membership) => ({
+      ...membership.board,
+      role: membership.role,
+    }));
+  }
 }
