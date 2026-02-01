@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -56,5 +60,24 @@ export class BoardService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async deleteBoard(boardId: string) {
+    const board = await this.boardRepo.findOneBy({ id: boardId });
+
+    if (!board) {
+      throw new NotFoundException('Board not found');
+    }
+
+    try {
+      await this.boardRepo.remove(board);
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Failed to delete board');
+    }
+
+    return {
+      id: boardId,
+    };
   }
 }
