@@ -54,4 +54,11 @@ export class BoardController {
     const user = req['user'] as JwtPayload;
     return this.boardService.getBoardsForUser(user.sub);
   }
+
+  @UseGuards(BoardRoleGuard)
+  @Get(':id')
+  getBoardById(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+    const user = req['user'] as JwtPayload;
+    return this.boardService.getBoardById(id, user.sub);
+  }
 }

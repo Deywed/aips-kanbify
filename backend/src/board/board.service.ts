@@ -113,4 +113,31 @@ export class BoardService {
       role: membership.role,
     }));
   }
+
+  async getBoardById(boardId: string, currentUserId: string) {
+    const membership = await this.memberRepo.findOne({
+      where: {
+        board: { id: boardId },
+        user: { id: currentUserId },
+      },
+    });
+
+    if (!membership) {
+      throw new NotFoundException('You are not a member of this board');
+    }
+
+    const board = await this.boardRepo.findOne({
+      where: { id: boardId },
+      relations: ['columns', 'columns.cards', 'columns.cards.tags'],
+    });
+
+    if (!board) {
+      throw new NotFoundException('Board not found');
+    }
+
+    return {
+      ...board,
+      role: membership.role,
+    };
+  }
 }

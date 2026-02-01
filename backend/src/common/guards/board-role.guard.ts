@@ -37,7 +37,7 @@ export class BoardRoleGuard implements CanActivate {
       [ctx.getHandler(), ctx.getClass()],
     );
 
-    // Ako ruta nema @BoardRole → samo proveri da je member
+    // Ako ruta nema @BoardRoleGuard → samo proveri da je member
     if (!requiredRoles) {
       return this.validateMembership(ctx);
     }
