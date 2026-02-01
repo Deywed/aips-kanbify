@@ -4,6 +4,7 @@ import {
   Delete,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -18,6 +19,7 @@ import { BoardRoleDecorator } from 'src/common/decorators/board-role.decorator';
 
 import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardRole } from 'src/board-members/entity/board-members.entity';
+import { UpdateBoardDto } from './dto/update-board.dto';
 
 @Controller('board')
 export class BoardController {
@@ -34,5 +36,15 @@ export class BoardController {
   @BoardRoleDecorator(BoardRole.ADMIN)
   deleteBoard(@Param('id', ParseUUIDPipe) id: string) {
     return this.boardService.deleteBoard(id);
+  }
+
+  @Patch(':id')
+  @UseGuards(BoardRoleGuard)
+  @BoardRoleDecorator(BoardRole.ADMIN)
+  async updateBoard(
+    @Param('id', ParseUUIDPipe) boardId: string,
+    @Body() dto: UpdateBoardDto,
+  ) {
+    return this.boardService.updateBoard(boardId, dto);
   }
 }

@@ -14,6 +14,7 @@ import {
 } from 'src/board-members/entity/board-members.entity';
 
 import { CreateBoardDto } from './dto/create-board.dto';
+import { UpdateBoardDto } from './dto/update-board.dto';
 
 @Injectable()
 export class BoardService {
@@ -59,6 +60,23 @@ export class BoardService {
       throw new InternalServerErrorException('Failed to create board');
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  async updateBoard(id: string, dto: UpdateBoardDto) {
+    const board = await this.boardRepo.findOneBy({ id });
+
+    if (!board) {
+      throw new NotFoundException('Board not found');
+    }
+
+    Object.assign(board, dto); // Update board properties with dto
+
+    try {
+      return await this.boardRepo.save(board);
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Failed to update board');
     }
   }
 
