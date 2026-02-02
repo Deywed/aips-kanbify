@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -32,6 +33,11 @@ export class BoardMembersController {
     @Body() dto: AddMemberDto,
   ) {
     return this.boardMembersService.addMember(boardId, dto);
+  }
+
+  @Get()
+  getMembers(@Param('boardId', ParseUUIDPipe) boardId: string) {
+    return this.boardMembersService.getMembers(boardId);
   }
 
   @Patch('/:userId/role')

@@ -24,6 +24,18 @@ export class BoardMembersService {
     private readonly userRepo: Repository<User>,
   ) {}
 
+  async getMembers(boardId: string) {
+    const members = await this.memberRepo.find({
+      where: { board: { id: boardId } },
+      relations: ['user'],
+    });
+
+    return members.map((m) => ({
+      user: m.user,
+      role: m.role,
+    }));
+  }
+
   async addMember(boardId: string, dto: AddMemberDto) {
     const board = await this.boardRepo.findOneBy({ id: boardId });
 
