@@ -1,7 +1,7 @@
 import {
   BadRequestException,
-  Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -66,7 +66,14 @@ export class BoardMembersService {
       role: dto.role,
     });
 
-    await this.memberRepo.save(member);
+    try {
+      await this.memberRepo.save(member);
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(
+        'Failed to add member to the board',
+      );
+    }
 
     return member;
   }
@@ -108,5 +115,36 @@ export class BoardMembersService {
     const saved = await this.memberRepo.save(targetMember);
 
     return saved;
+  }
+
+  // TODO: Think about what happens with the cards assigned to the removed member
+  async removeMember(boardId: string, userId: string, currentUserId: string) {
+    if (userId === currentUserId) {
+      throw new BadRequestException(
+        'You cannot remove yourself from the board',
+      );
+    }
+
+    const member = await this.memberRepo.findOne({
+      where: {
+        board: { id: boardId },
+        user: { id: userId },
+      },
+    });
+
+    if (!member) {
+      throw new NotFoundException('Member not found in the board');
+    }
+
+    try {
+      await this.memberRepo.remove(member);
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(
+        'Failed to remove member from the board',
+      );
+    }
+
+    return { id: userId };
   }
 }

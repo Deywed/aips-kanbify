@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -55,5 +56,16 @@ export class BoardMembersController {
       userId, // target
       dto.role,
     );
+  }
+
+  @Delete(':userId')
+  @BoardRoleDecorator(BoardRole.ADMIN)
+  removeMember(
+    @Req() req,
+    @Param('boardId', ParseUUIDPipe) boardId: string,
+    @Param('userId', ParseUUIDPipe) userId: string,
+  ) {
+    const user = req.user as JwtPayload;
+    return this.boardMembersService.removeMember(boardId, userId, user.sub);
   }
 }
