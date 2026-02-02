@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { BoardMember } from './entity/board-members.entity';
+import { BoardMember, BoardRole } from './entity/board-members.entity';
 import { Board } from 'src/board/entity/board.entity';
 import { User } from 'src/users/entity/user.entity';
 
@@ -57,5 +57,44 @@ export class BoardMembersService {
     await this.memberRepo.save(member);
 
     return member;
+  }
+
+  async updateMemberRole(
+    boardId: string,
+    requesterUserId: string,
+    targetUserId: string,
+    newRole: BoardRole,
+  ) {
+    if (requesterUserId === targetUserId) {
+      throw new BadRequestException('You cannot change your own role');
+    }
+
+    const members = await this.memberRepo.find({
+      where: {
+        board: { id: boardId },
+      },
+      relations: ['user'],
+    });
+
+    if (members.length === 0) {
+      throw new NotFoundException('No members found for the board');
+    }
+
+    const targetMember = members.find((m) => m.user.id === targetUserId);
+    const requesterMember = members.find((m) => m.user.id === requesterUserId);
+
+    if (!targetMember) {
+      throw new NotFoundException('Target member is not a member of the board');
+    }
+
+    if (!requesterMember) {
+      throw new NotFoundException('Requester is not a member of the board');
+    }
+
+    targetMember.role = newRole;
+
+    const saved = await this.memberRepo.save(targetMember);
+
+    return saved;
   }
 }
