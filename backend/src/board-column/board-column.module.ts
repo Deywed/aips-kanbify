@@ -14,5 +14,6 @@ import { BoardMember } from 'src/board-members/entity/board-members.entity';
   imports: [TypeOrmModule.forFeature([BoardColumn, Board, BoardMember])],
   providers: [BoardColumnService, BoardRoleGuard],
   controllers: [BoardColumnController],
+  exports: [BoardColumnService],
 })
 export class BoardColumnModule {}

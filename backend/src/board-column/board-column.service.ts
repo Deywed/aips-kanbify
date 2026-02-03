@@ -155,7 +155,7 @@ export class BoardColumnService {
     return columns;
   }
 
-  private async getColumnById(boardId: string, columnId: string) {
+  public async getColumnById(boardId: string, columnId: string) {
     const column = await this.columnRepo.findOne({
       where: {
         id: columnId,

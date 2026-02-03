@@ -12,6 +12,7 @@ import { CardModule } from './card/card.module';
 import { TagModule } from './tag/tag.module';
 import { CardHistoryModule } from './card-history/card-history.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     TagModule,
     CardHistoryModule,
     NotificationsModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],
