@@ -9,6 +9,7 @@ import {
 
 import { BoardMember } from 'src/board-members/entity/board-members.entity';
 import { BoardColumn } from 'src/board-column/entity/board-column.entity';
+import { Tag } from 'src/tag/entity/tag.entity';
 
 @Entity('boards')
 export class Board {
@@ -32,4 +33,7 @@ export class Board {
 
   @OneToMany(() => BoardColumn, (col) => col.board)
   columns: BoardColumn[];
+
+  @OneToMany(() => Tag, (tag) => tag.board)
+  tags: Tag[];
 }
