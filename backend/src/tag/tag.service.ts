@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Tag } from './entity/tag.entity';
 import { Repository } from 'typeorm';
@@ -12,38 +16,72 @@ export class TagService {
     private readonly tagRepository: Repository<Tag>,
   ) {}
 
-  async getAllTags() {
-    return this.tagRepository.find();
+  async getAllTags(boardId: string) {
+    return this.tagRepository.find({
+      where: { board: { id: boardId } },
+    });
   }
 
-  async getById(id: string) {
-    const tag = await this.tagRepository.findOneBy({ id });
-    if (!tag) throw new BadRequestException('Tag not found');
+  async createTag(boardId: string, dto: CreateTagDto) {
+    const exists = await this.tagRepository.findOneBy({
+      name: dto.name,
+      board: { id: boardId },
+    });
+
+    if (exists) {
+      throw new BadRequestException('Tag with this name already exists');
+    }
+
+    const tag = this.tagRepository.create({
+      ...dto,
+      board: { id: boardId },
+    });
+
+    try {
+      await this.tagRepository.save(tag);
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Failed to create tag');
+    }
+
     return tag;
   }
 
-  async createTag(dto: CreateTagDto) {
-    const exists = await this.tagRepository.findOneBy({ name: dto.name });
-    if (exists)
-      throw new BadRequestException('Tag with this name already exists');
+  async deleteTag(boardId: string, id: string) {
+    const exists = await this.tagRepository.findOneBy({
+      id,
+      board: { id: boardId },
+    });
 
-    const tag = this.tagRepository.create(dto);
-    return this.tagRepository.save(tag);
-  }
-
-  async deleteTag(id: string) {
-    const exists = await this.tagRepository.findOneBy({ id });
     if (!exists) throw new BadRequestException('Tag not found');
 
-    await this.tagRepository.delete({ id });
-    return { message: 'Tag deleted successfully' };
+    try {
+      await this.tagRepository.delete({ id });
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Failed to delete tag');
+    }
+
+    return { id };
   }
 
-  async updateTag(id: string, dto: UpdateTagDto) {
-    const tag = await this.tagRepository.findOneBy({ id });
+  async updateTag(boardId: string, id: string, dto: UpdateTagDto) {
+    const tag = await this.tagRepository.findOneBy({
+      id,
+      board: { id: boardId },
+    });
+
     if (!tag) throw new BadRequestException('Tag not found');
 
-    tag.name = dto.name ?? tag.name;
-    return this.tagRepository.save(tag);
+    Object.assign(tag, dto);
+
+    try {
+      await this.tagRepository.save(tag);
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Failed to update tag');
+    }
+
+    return tag;
   }
 }
