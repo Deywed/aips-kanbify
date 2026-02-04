@@ -5,11 +5,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-
 import { MoreThan, Repository } from 'typeorm';
+
+import { POSITION_GAP } from 'src/common/constants/positions.constant';
 
 import { BoardColumn } from './entity/board-column.entity';
 import { Board } from 'src/board/entity/board.entity';
+import { Card } from 'src/card/entity/card.entity';
 
 import { CreateColumnDto } from './dto/create-column.dto';
 import { UpdateColumnDto } from './dto/update-column.dto';
@@ -22,6 +24,8 @@ export class BoardColumnService {
     private readonly columnRepo: Repository<BoardColumn>,
     @InjectRepository(Board)
     private readonly boardRepo: Repository<Board>,
+    @InjectRepository(Card)
+    private readonly cardRepo: Repository<Card>,
   ) {}
 
   async createColumn(boardId: string, dto: CreateColumnDto) {
@@ -107,9 +111,9 @@ export class BoardColumnService {
       });
 
       if (!first) {
-        newPosition = 1;
+        newPosition = POSITION_GAP;
       } else {
-        newPosition = Number(first.position) - 1;
+        newPosition = Number(first.position) - POSITION_GAP;
       }
     }
 
@@ -127,7 +131,7 @@ export class BoardColumnService {
       });
 
       if (!next) {
-        newPosition = Number(after.position) + 1;
+        newPosition = Number(after.position) + POSITION_GAP;
       } else {
         newPosition = (Number(after.position) + Number(next.position)) / 2;
       }
@@ -155,7 +159,7 @@ export class BoardColumnService {
     return columns;
   }
 
-  public async getColumnById(boardId: string, columnId: string) {
+  async getColumnById(boardId: string, columnId: string) {
     const column = await this.columnRepo.findOne({
       where: {
         id: columnId,
@@ -168,5 +172,18 @@ export class BoardColumnService {
     }
 
     return column;
+  }
+
+  async getNextTopPosition(columnId: string) {
+    const firstCard = await this.cardRepo.findOne({
+      where: { column: { id: columnId } },
+      order: { position: 'ASC' },
+    });
+
+    if (!firstCard) {
+      return POSITION_GAP;
+    }
+
+    return Number(firstCard.position) - POSITION_GAP;
   }
 }

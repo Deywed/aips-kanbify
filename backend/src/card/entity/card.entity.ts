@@ -45,7 +45,7 @@ export class Card {
   @ManyToOne(() => User, { nullable: true })
   assignedTo?: User;
 
-  @OneToMany(() => CardTag, (ct) => ct.card)
+  @OneToMany(() => CardTag, (ct) => ct.card, { cascade: ['insert'] })
   tags: CardTag[];
 
   @OneToMany(() => CardHistory, (h) => h.card)
