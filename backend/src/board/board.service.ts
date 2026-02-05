@@ -128,7 +128,13 @@ export class BoardService {
 
     const board = await this.boardRepo.findOne({
       where: { id: boardId },
-      relations: ['columns', 'columns.cards', 'columns.cards.tags'],
+      relations: [
+        'columns',
+        'columns.cards',
+        'columns.cards.tags',
+        'columns.cards.assignedTo',
+        'columns.cards.createdBy',
+      ],
     });
 
     if (!board) {

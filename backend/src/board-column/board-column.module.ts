@@ -9,10 +9,12 @@ import { BoardRoleGuard } from 'src/common/guards/board-role.guard';
 import { BoardColumn } from './entity/board-column.entity';
 import { Board } from 'src/board/entity/board.entity';
 import { BoardMember } from 'src/board-members/entity/board-members.entity';
+import { Card } from 'src/card/entity/card.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([BoardColumn, Board, BoardMember])],
+  imports: [TypeOrmModule.forFeature([BoardColumn, Board, BoardMember, Card])],
   providers: [BoardColumnService, BoardRoleGuard],
   controllers: [BoardColumnController],
+  exports: [BoardColumnService],
 })
 export class BoardColumnModule {}

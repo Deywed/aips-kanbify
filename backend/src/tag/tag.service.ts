@@ -4,8 +4,10 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
+
 import { Tag } from './entity/tag.entity';
-import { Repository } from 'typeorm';
+
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 
@@ -83,5 +85,26 @@ export class TagService {
     }
 
     return tag;
+  }
+
+  async validateAndGetTags(boardId: string, tagIds?: string[]): Promise<Tag[]> {
+    if (!tagIds || tagIds.length === 0) {
+      return [];
+    }
+
+    const tags = await this.tagRepository.find({
+      where: {
+        id: In(tagIds),
+        board: { id: boardId },
+      },
+    });
+
+    if (tags.length !== tagIds.length) {
+      throw new BadRequestException(
+        'One or more tags were not found on this board',
+      );
+    }
+
+    return tags;
   }
 }

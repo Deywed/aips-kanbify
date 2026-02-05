@@ -147,4 +147,13 @@ export class BoardMembersService {
 
     return { id: userId };
   }
+
+  async isUserMemberOfBoard(boardId: string, userId: string) {
+    return await this.memberRepo.exists({
+      where: {
+        board: { id: boardId },
+        user: { id: userId },
+      },
+    });
+  }
 }
