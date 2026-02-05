@@ -3,4 +3,6 @@ export const API_ENDPOINTS = {
   REGISTER: `/auth/register`,
   REFRESH_TOKEN: `/auth/refresh`,
   LOGOUT: `/auth/logout`,
+
+  BOARDS: `/board`,
 };

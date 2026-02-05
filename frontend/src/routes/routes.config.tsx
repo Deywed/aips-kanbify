@@ -9,8 +9,8 @@ import PublicRoute from './PublicRoute';
 
 import LoginPage from '@/pages/Login';
 import RegisterPage from '@/pages/Register';
-import HomePage from '@/pages/Home';
 import NotFoundPage from '@/pages/NotFound';
+import BoardsPage from '@/pages/Boards';
 
 export const router = createBrowserRouter([
   {
@@ -30,7 +30,7 @@ export const router = createBrowserRouter([
     children: [
       {
         element: <AppLayout />,
-        children: [{ path: '/', element: <HomePage /> }],
+        children: [{ path: '/', element: <BoardsPage /> }],
       },
     ],
   },

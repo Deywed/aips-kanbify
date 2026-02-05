@@ -25,8 +25,16 @@ const AuthLayout = () => {
         <Outlet />
       </div>
 
-      <footer className="text-muted-foreground w-full border-t py-4 text-center text-sm">
-        &copy; {new Date().getFullYear()} Kanbify. All rights reserved.
+      <footer className="text-muted-foreground w-full py-4 text-center text-sm">
+        &copy; {new Date().getFullYear()}{' '}
+        <a
+          href="https://github.com/Deywed/aips-kanbify"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-primary underline underline-offset-4"
+        >
+          Kanbify
+        </a>
       </footer>
     </div>
   );
