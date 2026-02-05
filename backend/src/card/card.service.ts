@@ -94,7 +94,7 @@ export class CardService {
 
       await queryRunner.commitTransaction();
 
-      return this.getCardById(savedCard.id);
+      return savedCard;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       console.error('Create Card Error:', error);
@@ -104,10 +104,25 @@ export class CardService {
     }
   }
 
-  private async getCardById(id: string) {
-    return this.cardRepo.findOne({
-      where: { id },
-      relations: ['tags', 'tags.tag', 'assignedTo', 'createdBy', 'column'],
+  async removeCard(boardId: string, columnId: string, cardId: string) {
+    const card = await this.cardRepo.findOne({
+      where: {
+        id: cardId,
+        column: { id: columnId, board: { id: boardId } },
+      },
     });
+
+    if (!card) {
+      throw new NotFoundException('Card not found on this column and board');
+    }
+
+    try {
+      await this.cardRepo.remove(card);
+    } catch (error) {
+      console.error('Remove Card Error:', error);
+      throw new InternalServerErrorException('Failed to remove card');
+    }
+
+    return { id: cardId, message: 'Card removed successfully' };
   }
 }
