@@ -1,17 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { Add01Icon } from '@hugeicons/core-free-icons';
 
 import { API_ENDPOINTS } from '@/config/endpoints';
 
 import { type Board } from '@/types/board.types';
 
 import H3 from '@/components/ui/typography/H2';
-import { Button } from '@/components/ui/button';
 
 import Header from '@/components/common/Header';
 import BlockUI from '@/components/common/BlockUI';
 import BoardCard from './components/BoardCard';
+import NewBoardDialog from './components/NewBoardDialog';
 
 const BoardsPage = () => {
   const { data, isLoading, isError } = useQuery<Board[]>({
@@ -24,9 +22,7 @@ const BoardsPage = () => {
     <>
       <Header className="flex justify-between gap-4">
         <H3>My Boards</H3>
-        <Button>
-          <HugeiconsIcon icon={Add01Icon} /> New Board
-        </Button>
+        <NewBoardDialog />
       </Header>
 
       <div className="size-full p-4">

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Cancel01Icon } from '@hugeicons/core-free-icons';
 
 import { cn } from '@/lib/utils';
 
@@ -37,6 +38,7 @@ const BlockUI = ({
       <div className={cn('w-full', className)}>
         {error === undefined ? (
           <EmptyState
+            icon={Cancel01Icon}
             title="Something went wrong"
             description="Please try again in a moment."
           />
