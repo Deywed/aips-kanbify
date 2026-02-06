@@ -105,11 +105,12 @@ export class BoardService {
       where: {
         user: { id: userId },
       },
-      relations: ['board'],
+      relations: ['board', 'board.members.user'],
     });
 
     return memberships.map((membership) => ({
       ...membership.board,
+      members: membership.board.members.map((m) => m.user),
       role: membership.role,
     }));
   }
