@@ -124,7 +124,10 @@ export class BoardService {
 
     return memberships.map((membership) => ({
       ...membership.board,
-      members: membership.board.members.map((m) => m.user),
+      members: membership.board.members.map((m) => ({
+        ...m.user,
+        role: m.role,
+      })),
       role: membership.role,
     }));
   }
@@ -149,6 +152,7 @@ export class BoardService {
         'columns.cards.tags',
         'columns.cards.assignedTo',
         'columns.cards.createdBy',
+        'members.user',
       ],
     });
 
@@ -158,6 +162,10 @@ export class BoardService {
 
     return {
       ...board,
+      members: board.members.map((m) => ({
+        ...m.user,
+        role: m.role,
+      })),
       role: membership.role,
     };
   }
