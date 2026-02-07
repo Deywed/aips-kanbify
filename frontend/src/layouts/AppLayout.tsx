@@ -4,7 +4,7 @@ import LeftSidebar from '@/components/sidebar/LeftSidebar';
 
 const AppLayout = () => {
   return (
-    <div className="flex h-screen w-screen">
+    <div className="flex">
       <LeftSidebar />
 
       <main className="flex size-full flex-1 flex-col">
