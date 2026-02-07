@@ -5,4 +5,5 @@ export const API_ENDPOINTS = {
   LOGOUT: `/auth/logout`,
 
   BOARDS: `/board`,
+  BOARD: (boardId: string) => `/board/${boardId}`,
 };

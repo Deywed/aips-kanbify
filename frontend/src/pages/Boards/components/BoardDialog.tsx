@@ -1,14 +1,18 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { toast } from 'sonner';
 
+import { getDirtyValues } from '@/lib/utils';
+
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   newBoardSchema,
   type NewBoardSchemaType,
 } from '../schema/newBoard.schema';
+import type { Board } from '@/types/board.types';
 
-import { useCreateBoardMutation } from '@/mutations/boards/createBoardMutation';
+import { useCreateBoardMutation } from '@/mutations/boards/useCreateBoardMutation';
+import { useUpdateBoardMutation } from '@/mutations/boards/useUpdateBoardMutation';
 
 import FormInput from '@/components/form/FormInput';
 import FormTextarea from '@/components/form/FormTextarea';
@@ -27,27 +31,52 @@ import {
 type BoardDialogProps = {
   isOpen: boolean;
   open: Dispatch<SetStateAction<boolean>>;
+  initialBoard?: Board;
 };
 
-const BoardDialog = ({ isOpen, open }: BoardDialogProps) => {
+const BoardDialog = ({ isOpen, open, initialBoard }: BoardDialogProps) => {
   const form = useForm({
     resolver: zodResolver(newBoardSchema),
     defaultValues: {
-      title: '',
-      description: '',
+      title: initialBoard?.title || '',
+      description: initialBoard?.description || '',
     },
   });
 
-  const { mutate, isPending } = useCreateBoardMutation();
+  const {
+    formState: { dirtyFields },
+  } = form;
+
+  const createMutation = useCreateBoardMutation();
+  const updateMutation = useUpdateBoardMutation(initialBoard?.id || '');
+
+  const isPending = createMutation.isPending || updateMutation.isPending;
 
   const onSubmit = async (data: NewBoardSchemaType) => {
-    mutate(data, {
-      onSuccess: () => {
+    if (initialBoard) {
+      const dirtyValues = getDirtyValues(dirtyFields, data);
+
+      if (Object.keys(dirtyValues).length === 0) {
         open(false);
-        toast.success('Board created successfully!');
-        form.reset();
-      },
-    });
+        return;
+      }
+
+      updateMutation.mutate(dirtyValues, {
+        onSuccess: () => {
+          open(false);
+          toast.success('Board updated successfully!');
+          form.reset(data);
+        },
+      });
+    } else {
+      createMutation.mutate(data, {
+        onSuccess: () => {
+          open(false);
+          toast.success('Board created successfully!');
+          form.reset();
+        },
+      });
+    }
   };
 
   return (
@@ -55,7 +84,9 @@ const BoardDialog = ({ isOpen, open }: BoardDialogProps) => {
       <Dialog open={isOpen} onOpenChange={open}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create new board</DialogTitle>
+            <DialogTitle>
+              {initialBoard ? 'Edit board' : 'Create new board'}
+            </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -84,7 +115,9 @@ const BoardDialog = ({ isOpen, open }: BoardDialogProps) => {
                   }
                 />
                 <Button type="submit" disabled={isPending}>
-                  <LoadingSwap isLoading={isPending}>Create</LoadingSwap>
+                  <LoadingSwap isLoading={isPending}>
+                    {initialBoard ? 'Save' : 'Create Board'}
+                  </LoadingSwap>
                 </Button>
               </DialogFooter>
             </FieldGroup>

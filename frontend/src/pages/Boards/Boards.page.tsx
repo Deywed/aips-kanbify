@@ -11,8 +11,8 @@ import H3 from '@/components/ui/typography/H2';
 import { Button } from '@/components/ui/button';
 
 import Header from '@/components/common/Header';
-
 import BlockUI from '@/components/common/BlockUI';
+
 import BoardCard from './components/BoardCard';
 import BoardDialog from './components/BoardDialog';
 

@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import type { Board } from '@/types/board.types';
 
@@ -13,28 +13,32 @@ import {
 
 import UserAvatar from '@/components/common/UserAvatar';
 
+import BoardCardDropdown from './BoardCardDropdown';
+
 type BoardCardProps = {
   board: Board;
 };
 
 const BoardCard = ({ board }: BoardCardProps) => {
-  const navigate = useNavigate();
-
   const isAdminRole = board.role === 'ADMIN';
 
   return (
-    <Card
-      className="hover:bg-muted/40 cursor-pointer gap-4 transition-colors"
-      onClick={() => navigate(`/boards/${board.id}`)}
-    >
+    <Card className="hover:bg-muted/40 gap-4 transition-colors">
       <CardHeader>
-        <CardTitle>
-          <div className="flex flex-col gap-2">
+        <CardTitle className="flex">
+          <Link
+            to={`/boards/${board.id}`}
+            className="group flex flex-1 flex-col gap-2"
+          >
             <Badge variant={`${isAdminRole ? 'default' : 'secondary'}`}>
               {isAdminRole ? 'Admin' : 'Member'}
             </Badge>
-            <span>{board.title}</span>
-          </div>
+            <span className="underline-offset-4 group-hover:underline">
+              {board.title}
+            </span>
+          </Link>
+
+          <BoardCardDropdown board={board} />
         </CardTitle>
         {board.description && (
           <CardDescription>{board.description}</CardDescription>
