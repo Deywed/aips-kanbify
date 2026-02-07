@@ -1,6 +1,7 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EventEmitterModule } from '@nestjs/event-emitter/dist/event-emitter.module';
 import { createTypeOrmOptions } from './database/typeorm.config';
 
 import { JwtGlobalModule } from './jwt/jwt.module';
@@ -24,6 +25,11 @@ import { UsersModule } from './users/users.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) =>
         createTypeOrmOptions(configService),
+    }),
+    EventEmitterModule.forRoot({
+      wildcard: false,
+      delimiter: '.',
+      maxListeners: 10,
     }),
     JwtGlobalModule,
     AuthModule,

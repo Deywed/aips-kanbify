@@ -30,10 +30,12 @@ export class BoardMembersController {
   @Post()
   @BoardRoleDecorator(BoardRole.ADMIN)
   addMember(
+    @Req() req,
     @Param('boardId', ParseUUIDPipe) boardId: string,
     @Body() dto: AddMemberDto,
   ) {
-    return this.boardMembersService.addMember(boardId, dto);
+    const user = req.user as JwtPayload;
+    return this.boardMembersService.addMember(boardId, dto, user.sub);
   }
 
   @Get()
