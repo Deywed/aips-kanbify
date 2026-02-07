@@ -37,7 +37,7 @@ const LoginForm = () => {
         setUser(response.user);
 
         toast.success('Login successful!');
-        navigate('/');
+        navigate('/boards');
       },
     });
   }

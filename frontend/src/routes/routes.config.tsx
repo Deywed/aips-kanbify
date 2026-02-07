@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 import AuthLayout from '@/layouts/AuthLayout';
 import AppLayout from '@/layouts/AppLayout';
@@ -9,10 +10,14 @@ import PublicRoute from './PublicRoute';
 
 import LoginPage from '@/pages/Login';
 import RegisterPage from '@/pages/Register';
-import HomePage from '@/pages/Home';
 import NotFoundPage from '@/pages/NotFound';
+import BoardsPage from '@/pages/Boards';
 
 export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Navigate to="/boards" replace />,
+  },
   {
     element: <PublicRoute />,
     children: [
@@ -30,7 +35,7 @@ export const router = createBrowserRouter([
     children: [
       {
         element: <AppLayout />,
-        children: [{ path: '/', element: <HomePage /> }],
+        children: [{ path: '/boards', element: <BoardsPage /> }],
       },
     ],
   },

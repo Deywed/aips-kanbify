@@ -49,11 +49,20 @@ export class BoardService {
         role: BoardRole.ADMIN,
       });
 
-      await queryRunner.manager.save(member);
+      const savedMember = await queryRunner.manager.save(member);
+
+      const memberWithUser = await queryRunner.manager.findOne(BoardMember, {
+        where: { id: savedMember.id },
+        relations: ['user'],
+      });
 
       await queryRunner.commitTransaction();
 
-      return board;
+      return {
+        ...board,
+        members: [memberWithUser?.user],
+        role: member.role,
+      };
     } catch (err) {
       console.error(err);
       await queryRunner.rollbackTransaction();
@@ -105,11 +114,17 @@ export class BoardService {
       where: {
         user: { id: userId },
       },
-      relations: ['board'],
+      relations: ['board', 'board.members.user'],
+      order: {
+        board: {
+          updatedAt: 'DESC',
+        },
+      },
     });
 
     return memberships.map((membership) => ({
       ...membership.board,
+      members: membership.board.members.map((m) => m.user),
       role: membership.role,
     }));
   }
