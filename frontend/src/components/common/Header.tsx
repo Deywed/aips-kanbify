@@ -1,13 +1,28 @@
+import { useNavigate } from 'react-router-dom';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ArrowLeft02Icon } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils';
-import { Skeleton } from '@/components/ui/skeleton';
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
 
 type HeaderProps = {
   children: React.ReactNode;
-  isLoading?: boolean;
+  showBackButton?: boolean;
   className?: string;
 };
 
-const Header = ({ children, isLoading, className }: HeaderProps) => {
+const Header = ({
+  children,
+  showBackButton = false,
+  className,
+}: HeaderProps) => {
+  const navigate = useNavigate();
+
   return (
     <div
       className={cn(
@@ -15,7 +30,23 @@ const Header = ({ children, isLoading, className }: HeaderProps) => {
         className,
       )}
     >
-      {isLoading ? <Skeleton className="h-6 w-32" /> : children}
+      {showBackButton && (
+        <Tooltip delay={400}>
+          <TooltipTrigger
+            render={
+              <Button
+                size="icon-lg"
+                variant="ghost"
+                onClick={() => navigate(-1)}
+              >
+                <HugeiconsIcon icon={ArrowLeft02Icon} className="size-6" />
+              </Button>
+            }
+          />
+          <TooltipContent>Back</TooltipContent>
+        </Tooltip>
+      )}
+      {children}
     </div>
   );
 };
