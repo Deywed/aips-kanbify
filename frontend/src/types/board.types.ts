@@ -1,4 +1,4 @@
-import type { User } from './auth.types';
+import type { BoardMember } from './auth.types';
 
 export type BoardRole = 'ADMIN' | 'MEMBER';
 
@@ -9,5 +9,5 @@ export type Board = {
   title: string;
   description?: string;
   role: BoardRole;
-  members?: User[];
+  members?: BoardMember[];
 };

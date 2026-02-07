@@ -5,4 +5,5 @@ export const APP_ROUTES = {
   BOARDS: `/boards`,
   NOTIFICATIONS: '/notifications',
   USERS: '/users',
+  USER_DETAILS: (userId: string) => `/users/${userId}`,
 };
