@@ -29,7 +29,7 @@ export const useBoardStore = create<BoardState>((set) => ({
   board: null,
   isLoading: false,
 
-  setBoard: (board) => set({ board }),
+  setBoard: (board) => set({ board, isLoading: false }),
 
   setLoading: (isLoading) => set({ isLoading }),
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { EditUser02Icon } from '@hugeicons/core-free-icons';
 
@@ -27,13 +27,15 @@ import {
 import Header from '@/components/common/Header';
 import BoardRoleBadge from '@/components/board/BoardRoleBadge';
 import BoardMembersAvatars from '@/components/board/BoardMembersAvatars';
+import { BoardAdminGuard } from '@/components/guards/BoardAdminGuard';
 
 import BoardMembersDrawer from './components/BoardMembersDrawer';
-import { BoardAdminGuard } from '@/components/guards/BoardAdminGuard';
 
 const BoardDetailsPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
   const [isMembersDrawerOpen, setIsMembersDrawerOpen] = useState(false);
+
+  const queryClient = useQueryClient();
 
   // Zustand hooks
   const { setBoard, resetBoard } = useBoardActions();
@@ -53,8 +55,13 @@ const BoardDetailsPage = () => {
   }, [data, isSuccess, setBoard]);
 
   useEffect(() => {
-    return () => resetBoard();
-  }, [resetBoard]);
+    return () => {
+      resetBoard();
+      queryClient.invalidateQueries({
+        queryKey: [API_ENDPOINTS.BOARD(boardId || '')],
+      });
+    };
+  }, [boardId, queryClient, resetBoard]);
 
   return (
     <>

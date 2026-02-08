@@ -78,7 +78,10 @@ export class BoardMembersService {
       );
     }
 
-    return member;
+    return {
+      ...member.user,
+      role: member.role,
+    };
   }
 
   async updateMemberRole(
