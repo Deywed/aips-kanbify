@@ -10,8 +10,10 @@ import { cn } from '@/lib/utils';
 import { APP_ROUTES } from '@/config/appRoutes';
 
 import { useAuthUser } from '@/stores/auth.store';
+import { useUnreadNotificationsCount } from '@/stores/notifications.store';
 
 import { buttonVariants } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 import CurrentUserAvatar from '@/components/common/CurrentUserAvatar';
 import Logo from '@/components/common/Logo';
@@ -28,6 +30,7 @@ const sidebarLinks = [
 
 const LeftSidebar = () => {
   const user = useAuthUser();
+  const unreadCount = useUnreadNotificationsCount();
 
   return (
     <aside className="sticky top-0 flex h-screen min-w-64 flex-col gap-8 border-r p-4">
@@ -35,6 +38,8 @@ const LeftSidebar = () => {
 
       <nav className="flex flex-col gap-2">
         {sidebarLinks.map((link) => {
+          const isNotifications = link.to === APP_ROUTES.NOTIFICATIONS;
+
           return (
             <NavLink
               to={
@@ -55,7 +60,14 @@ const LeftSidebar = () => {
               }
             >
               <HugeiconsIcon icon={link.icon} />
+
               <span>{link.label}</span>
+
+              {isNotifications && unreadCount > 0 && (
+                <Badge className="ml-auto">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </Badge>
+              )}
             </NavLink>
           );
         })}
