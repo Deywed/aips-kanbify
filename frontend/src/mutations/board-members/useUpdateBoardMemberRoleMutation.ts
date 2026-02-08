@@ -5,24 +5,31 @@ import { API_ENDPOINTS } from '@/config/endpoints';
 
 import { useBoardActions } from '@/stores/board.store';
 
+import type { BoardMember } from '@/types/auth.types';
+import type { BoardRole } from '@/types/board.types';
+
 import { useBaseMutation } from '../useBaseMutation';
 
-export const useDeleteBoardMemberMutation = (
+type UpdateBoardMemberRoleVariables = {
+  role: BoardRole;
+};
+
+export const useUpdateBoardMemberRoleMutation = (
   boardId: string,
   userId: string,
 ) => {
   const queryClient = useQueryClient();
 
-  const { removeMember } = useBoardActions();
+  const { updateMemberRole } = useBoardActions();
 
-  return useBaseMutation<{ id: string }, Error, void>(
+  return useBaseMutation<BoardMember, Error, UpdateBoardMemberRoleVariables>(
     {
-      path: API_ENDPOINTS.DELETE_BOARD_MEMBER(boardId, userId),
-      method: 'DELETE',
+      path: API_ENDPOINTS.UPDATE_BOARD_MEMBER_ROLE(boardId, userId),
+      method: 'PATCH',
     },
     {
-      onSuccess: () => {
-        removeMember(userId);
+      onSuccess: (_updatedMember, variables) => {
+        updateMemberRole(userId, variables.role);
         queryClient.invalidateQueries({
           queryKey: [API_ENDPOINTS.BOARDS],
         });

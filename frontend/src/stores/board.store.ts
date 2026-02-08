@@ -1,8 +1,8 @@
 import { create } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
 
 import type { BoardMember } from '@/types/auth.types';
-import type { BoardDetails } from '@/types/board.types';
-import { useShallow } from 'zustand/react/shallow';
+import type { BoardDetails, BoardRole } from '@/types/board.types';
 
 type BoardState = {
   // State
@@ -16,6 +16,7 @@ type BoardState = {
   // Real time actions for WebSocket updates
   addMember: (member: BoardMember) => void;
   removeMember: (userId: string) => void;
+  updateMemberRole: (userId: string, newRole: BoardRole) => void;
   // TODO: add more actions for columns, cards, etc. as needed
 
   // Clean up board state when leaving the board page
@@ -58,6 +59,19 @@ export const useBoardStore = create<BoardState>((set) => ({
       };
     }),
 
+  updateMemberRole: (userId: string, newRole: BoardRole) =>
+    set((state) => {
+      if (!state.board) return {};
+      return {
+        board: {
+          ...state.board,
+          members: state.board.members.map((m) =>
+            m.id === userId ? { ...m, role: newRole } : m,
+          ),
+        },
+      };
+    }),
+
   resetBoard: () => set({ board: null, isLoading: false }),
 }));
 
@@ -90,6 +104,7 @@ export const useBoardActions = () =>
       setLoading: state.setLoading,
       addMember: state.addMember,
       removeMember: state.removeMember,
+      updateMemberRole: state.updateMemberRole,
       resetBoard: state.resetBoard,
     })),
   );

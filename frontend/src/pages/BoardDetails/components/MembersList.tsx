@@ -5,16 +5,14 @@ import { toast } from 'sonner';
 import { roleToLabel } from '@/lib/utils';
 
 import type { BoardMember } from '@/types/auth.types';
+import type { BoardRole } from '@/types/board.types';
 import { BOARD_ROLES } from '@/types/board.types';
 
 import { useAuthUser } from '@/stores/auth.store';
-import {
-  useBoardActions,
-  useBoardInfo,
-  useBoardMembers,
-} from '@/stores/board.store';
+import { useBoardInfo, useBoardMembers } from '@/stores/board.store';
 
 import { useDeleteBoardMemberMutation } from '@/mutations/board-members/useDeleteBoardMemberMutation';
+import { useUpdateBoardMemberRoleMutation } from '@/mutations/board-members/useUpdateBoardMemberRoleMutation';
 
 import {
   DropdownMenu,
@@ -52,7 +50,6 @@ type MembersListItem = {
 const MembersListItem = ({ member }: MembersListItem) => {
   const currentUser = useAuthUser();
   const boardInfo = useBoardInfo();
-  const { removeMember } = useBoardActions();
 
   const [role, setRole] = useState(member.role);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -60,14 +57,34 @@ const MembersListItem = ({ member }: MembersListItem) => {
   const { mutate: deleteMemberMutate, isPending: isDeletePending } =
     useDeleteBoardMemberMutation(boardInfo?.id || '', member.id);
 
+  const { mutate: updateMemberRoleMutate, isPending: isUpdateRolePending } =
+    useUpdateBoardMemberRoleMutation(boardInfo?.id || '', member.id);
+
   const isCurrentUser = currentUser?.id === member.id;
+
+  const handleRoleChange = (nextRole: BoardRole) => {
+    if (nextRole === role) {
+      return;
+    }
+
+    setRole(nextRole);
+    updateMemberRoleMutate(
+      { role: nextRole },
+      {
+        onSuccess: () => {
+          toast.success(
+            `Updated @${member.username}'s role to ${roleToLabel(nextRole)}`,
+          );
+        },
+      },
+    );
+  };
 
   const handleDeleteMember = () => {
     deleteMemberMutate(undefined, {
       onSuccess: () => {
         toast.success(`Removed @${member.username} from board`);
         setDeleteDialogOpen(false);
-        removeMember(member.id);
       },
     });
   };
@@ -78,14 +95,18 @@ const MembersListItem = ({ member }: MembersListItem) => {
         <UserDisplay key={member.id} user={member} link />
 
         <ButtonGroup>
-          <Button variant="outline" size="sm">
+          <Button variant={role === 'ADMIN' ? 'default' : 'outline'} size="sm">
             {roleToLabel(role)}
           </Button>
           {!isCurrentUser && (
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger
                 render={
-                  <Button variant="outline" size="icon-sm">
+                  <Button
+                    variant="outline"
+                    size="icon-sm"
+                    disabled={isUpdateRolePending}
+                  >
                     <HugeiconsIcon icon={ArrowDown01Icon} />
                   </Button>
                 }
@@ -93,7 +114,12 @@ const MembersListItem = ({ member }: MembersListItem) => {
               <DropdownMenuContent className="z-100 w-32">
                 <DropdownMenuGroup>
                   <DropdownMenuLabel>Role</DropdownMenuLabel>
-                  <DropdownMenuRadioGroup value={role} onValueChange={setRole}>
+                  <DropdownMenuRadioGroup
+                    value={role}
+                    onValueChange={(value) =>
+                      handleRoleChange(value as BoardRole)
+                    }
+                  >
                     {BOARD_ROLES.map((r) => (
                       <DropdownMenuRadioItem key={r} value={r}>
                         {roleToLabel(r)}
