@@ -1,6 +1,8 @@
 import type { BoardMember, User } from './auth.types';
 
-export type BoardRole = 'ADMIN' | 'MEMBER';
+export const BOARD_ROLES = ['ADMIN', 'MEMBER'] as const;
+
+export type BoardRole = (typeof BOARD_ROLES)[number];
 
 export type Board = {
   id: string;

@@ -16,8 +16,8 @@ import { useAddBoardMemberMutation } from '@/mutations/board-members/useAddBoard
 import LoadingButton from '@/components/ui/loading-button';
 
 import SearchInput from '@/components/common/SearchInput';
-import UserAvatar from '@/components/common/UserAvatar';
 import BlockUI from '@/components/common/BlockUI';
+import UserDisplay from '@/components/common/UserDisplay';
 
 const SearchMembers = () => {
   const [inputValue, setInputValue] = useState('');
@@ -91,13 +91,7 @@ const SearchMemberItem = ({ user, onAddedSuccess }: SearchMemberItemProps) => {
 
   return (
     <div className="flex w-full items-center justify-between gap-2">
-      <div className="flex gap-2">
-        <UserAvatar user={user} />
-        <div className="flex flex-col text-sm">
-          <span>{getUserFullName(user)}</span>
-          <span className="text-muted-foreground">@{user.username}</span>
-        </div>
-      </div>
+      <UserDisplay user={user} />
 
       <LoadingButton
         size="sm"

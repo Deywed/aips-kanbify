@@ -2,19 +2,20 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { Add01Icon, ArrowRight02Icon } from '@hugeicons/core-free-icons';
 
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from '@/components/ui/drawer';
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import SearchMembers from './SearchMembers';
+import MembersList from './MembersList';
 
 type BoardMembersDrawerProps = {
   isOpen: boolean;
@@ -26,14 +27,14 @@ const BoardMembersDrawer = ({
   onOpenChange,
 }: BoardMembersDrawerProps) => {
   return (
-    <Drawer direction="right" open={isOpen} onOpenChange={onOpenChange}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle className="text-lg">Manage board members</DrawerTitle>
-          <DrawerDescription>
+    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+      <SheetContent side="right">
+        <SheetHeader>
+          <SheetTitle className="text-lg">Manage board members</SheetTitle>
+          <SheetDescription>
             Add, remove, or change roles of members on this board
-          </DrawerDescription>
-        </DrawerHeader>
+          </SheetDescription>
+        </SheetHeader>
 
         <ScrollArea className="overflow-x-auto overflow-y-auto">
           <Tabs defaultValue="members-list">
@@ -46,7 +47,7 @@ const BoardMembersDrawer = ({
             </TabsList>
 
             <TabsContent value="members-list" className="p-4">
-              members list here...
+              <MembersList />
             </TabsContent>
 
             <TabsContent value="add-new-member" className="p-4">
@@ -55,16 +56,19 @@ const BoardMembersDrawer = ({
           </Tabs>
         </ScrollArea>
 
-        <DrawerFooter>
-          <DrawerClose className="mr-auto">
-            <Button variant="outline">
-              Close
-              <HugeiconsIcon icon={ArrowRight02Icon} />
-            </Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        <SheetFooter>
+          <SheetClose
+            className="mr-auto"
+            render={
+              <Button variant="outline">
+                Close
+                <HugeiconsIcon icon={ArrowRight02Icon} />
+              </Button>
+            }
+          ></SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 };
 

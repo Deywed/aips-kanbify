@@ -1,8 +1,3 @@
-import { Link } from 'react-router-dom';
-import { getUserFullName } from '@/lib/utils';
-
-import { APP_ROUTES } from '@/config/appRoutes';
-
 import type { BoardMember } from '@/types/auth.types';
 
 import {
@@ -14,6 +9,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 import UserAvatar from '@/components/common/UserAvatar';
+import UserDisplay from '@/components/common/UserDisplay';
 
 type BoardMembersAvatars = {
   members?: BoardMember[];
@@ -48,21 +44,7 @@ const BoardMembersAvatars = ({
           </HoverCardTrigger>
           <HoverCardContent align="end" className="flex flex-col gap-2">
             {members.slice(maxVisible).map((member) => (
-              <Link
-                to={APP_ROUTES.USER_DETAILS(member.id)}
-                key={member.id}
-                className="group flex gap-2"
-              >
-                <UserAvatar user={member} />
-                <div className="flex flex-col text-sm">
-                  <span className="underline-offset-4 group-hover:underline">
-                    {getUserFullName(member)}
-                  </span>
-                  <span className="text-muted-foreground">
-                    @{member.username}
-                  </span>
-                </div>
-              </Link>
+              <UserDisplay key={member.id} user={member} link />
             ))}
           </HoverCardContent>
         </HoverCard>

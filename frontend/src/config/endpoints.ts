@@ -11,4 +11,6 @@ export const API_ENDPOINTS = {
   BOARD: (boardId: string) => `/board/${boardId}`,
 
   ADD_BOARD_MEMBER: (boardId: string) => `/board/${boardId}/members`,
+  DELETE_BOARD_MEMBER: (boardId: string, userId: string) =>
+    `/board/${boardId}/members/${userId}`,
 };
