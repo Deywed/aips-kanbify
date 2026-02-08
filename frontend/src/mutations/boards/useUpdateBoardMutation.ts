@@ -36,6 +36,10 @@ export const useUpdateBoardMutation = (boardId: string) => {
             );
           },
         );
+
+        queryClient.invalidateQueries({
+          queryKey: [API_ENDPOINTS.BOARD(boardId)],
+        });
       },
       onError: (error) => {
         toast.error(error.message);

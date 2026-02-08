@@ -12,6 +12,7 @@ import LoginPage from '@/pages/Login';
 import RegisterPage from '@/pages/Register';
 import NotFoundPage from '@/pages/NotFound';
 import BoardsPage from '@/pages/Boards';
+import BoardDetailsPage from '@/pages/BoardDetails';
 
 export const router = createBrowserRouter([
   {
@@ -35,7 +36,10 @@ export const router = createBrowserRouter([
     children: [
       {
         element: <AppLayout />,
-        children: [{ path: '/boards', element: <BoardsPage /> }],
+        children: [
+          { path: '/boards', element: <BoardsPage /> },
+          { path: '/boards/:boardId', element: <BoardDetailsPage /> },
+        ],
       },
     ],
   },

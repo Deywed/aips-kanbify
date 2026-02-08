@@ -1,3 +1,5 @@
+import type { BoardRole } from './board.types';
+
 export type User = {
   id: string;
   firstName: string;
@@ -7,4 +9,8 @@ export type User = {
   bio?: string;
   avatarUrl?: string;
   avatarPublicId?: string;
+};
+
+export type BoardMember = User & {
+  role: BoardRole;
 };

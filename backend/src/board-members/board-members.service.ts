@@ -6,12 +6,16 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { BoardMember, BoardRole } from './entity/board-members.entity';
 import { Board } from 'src/board/entity/board.entity';
 import { User } from 'src/users/entity/user.entity';
 
+import { EVENTS } from 'src/common/constants/events.constants';
 import { AddMemberDto } from './dto/add-member.dto';
+import { BoardMemberAddedEvent } from './events/board-member-added.event';
+import { BoardMemberResponseDto } from './dto/board-member-response.dto';
 
 @Injectable()
 export class BoardMembersService {
@@ -22,6 +26,7 @@ export class BoardMembersService {
     private readonly boardRepo: Repository<Board>,
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async getMembers(boardId: string) {
@@ -30,13 +35,10 @@ export class BoardMembersService {
       relations: ['user'],
     });
 
-    return members.map((m) => ({
-      user: m.user,
-      role: m.role,
-    }));
+    return BoardMemberResponseDto.fromEntities(members);
   }
 
-  async addMember(boardId: string, dto: AddMemberDto) {
+  async addMember(boardId: string, dto: AddMemberDto, currentUserId: string) {
     const board = await this.boardRepo.findOneBy({ id: boardId });
 
     if (!board) {
@@ -49,14 +51,9 @@ export class BoardMembersService {
       throw new NotFoundException('User not found');
     }
 
-    const exists = await this.memberRepo.exists({
-      where: {
-        board: { id: boardId },
-        user: { id: dto.userId },
-      },
-    });
+    const isMember = await this.isUserMemberOfBoard(boardId, dto.userId);
 
-    if (exists) {
+    if (isMember) {
       throw new BadRequestException('User is already a member of the board');
     }
 
@@ -68,6 +65,10 @@ export class BoardMembersService {
 
     try {
       await this.memberRepo.save(member);
+      this.eventEmitter.emit(
+        EVENTS.BOARD_MEMBER_ADDED,
+        new BoardMemberAddedEvent(boardId, dto.userId, currentUserId, dto.role),
+      );
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(
@@ -75,7 +76,7 @@ export class BoardMembersService {
       );
     }
 
-    return member;
+    return BoardMemberResponseDto.fromEntity(member);
   }
 
   async updateMemberRole(
@@ -110,14 +111,20 @@ export class BoardMembersService {
       throw new NotFoundException('Requester is not a member of the board');
     }
 
-    targetMember.role = newRole;
+    try {
+      targetMember.role = newRole;
+      const saved = await this.memberRepo.save(targetMember);
 
-    const saved = await this.memberRepo.save(targetMember);
+      // TODO: Emit an event for role change
 
-    return saved;
+      return BoardMemberResponseDto.fromEntity(saved);
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Failed to update member role');
+    }
   }
 
-  // TODO: Think about what happens with the cards assigned to the removed member
+  // TODO: All cards where this user is assigned should be unassigned
   async removeMember(boardId: string, userId: string, currentUserId: string) {
     if (userId === currentUserId) {
       throw new BadRequestException(
@@ -138,6 +145,8 @@ export class BoardMembersService {
 
     try {
       await this.memberRepo.remove(member);
+
+      // TODO: Emit an event for member removal
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(
