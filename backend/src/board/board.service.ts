@@ -15,6 +15,7 @@ import {
 
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
+import { BoardMemberResponseDto } from 'src/board-members/dto/board-member-response.dto';
 
 @Injectable()
 export class BoardService {
@@ -124,10 +125,7 @@ export class BoardService {
 
     return memberships.map((membership) => ({
       ...membership.board,
-      members: membership.board.members.map((m) => ({
-        ...m.user,
-        role: m.role,
-      })),
+      members: BoardMemberResponseDto.fromEntities(membership.board.members),
       role: membership.role,
     }));
   }
@@ -162,10 +160,7 @@ export class BoardService {
 
     return {
       ...board,
-      members: board.members.map((m) => ({
-        ...m.user,
-        role: m.role,
-      })),
+      members: BoardMemberResponseDto.fromEntities(board.members),
       role: membership.role,
     };
   }
