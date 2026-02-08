@@ -1,12 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { EditUser02Icon } from '@hugeicons/core-free-icons';
 
+import {
+  useBoardActions,
+  useBoardInfo,
+  useBoardMembers,
+  useUserBoardRole,
+} from '@/stores/board.store';
+
 import { API_ENDPOINTS } from '@/config/endpoints';
 
-import { type Board } from '@/types/board.types';
+import { type BoardDetails } from '@/types/board.types';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import H3 from '@/components/ui/typography/H3';
@@ -20,16 +27,34 @@ import {
 import Header from '@/components/common/Header';
 import BoardRoleBadge from '@/components/board/BoardRoleBadge';
 import BoardMembersAvatars from '@/components/board/BoardMembersAvatars';
+
 import BoardMembersDrawer from './components/BoardMembersDrawer';
+import { BoardAdminGuard } from '@/components/guards/BoardAdminGuard';
 
 const BoardDetailsPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
-
   const [isMembersDrawerOpen, setIsMembersDrawerOpen] = useState(false);
 
-  const { data, isLoading, isError } = useQuery<Board>({
+  // Zustand hooks
+  const { setBoard, resetBoard } = useBoardActions();
+  const boardInfo = useBoardInfo();
+  const members = useBoardMembers();
+  const currentUserRole = useUserBoardRole();
+
+  const { data, isLoading, isError, isSuccess } = useQuery<BoardDetails>({
     queryKey: [API_ENDPOINTS.BOARD(boardId || '')],
+    enabled: !!boardId,
   });
+
+  useEffect(() => {
+    if (isSuccess && data) {
+      setBoard(data);
+    }
+  }, [data, isSuccess, setBoard]);
+
+  useEffect(() => {
+    return () => resetBoard();
+  }, [resetBoard]);
 
   return (
     <>
@@ -42,32 +67,37 @@ const BoardDetailsPage = () => {
               ) : isError ? (
                 'Board Not Found'
               ) : (
-                data?.title
+                boardInfo.title
               )}
             </H3>
 
-            {data && <BoardRoleBadge role={data.role} />}
+            {currentUserRole && <BoardRoleBadge role={currentUserRole} />}
           </div>
 
           <div className="flex items-center gap-2">
-            <BoardMembersAvatars members={data?.members} />
-            <Tooltip delay={300}>
-              <TooltipTrigger
-                render={
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={() => setIsMembersDrawerOpen(true)}
-                  >
-                    <HugeiconsIcon icon={EditUser02Icon} />
-                  </Button>
-                }
-              />
-              <TooltipContent>Manage members</TooltipContent>
-            </Tooltip>
+            <BoardMembersAvatars members={members} />
+
+            <BoardAdminGuard>
+              <Tooltip delay={300}>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsMembersDrawerOpen(true)}
+                    >
+                      <HugeiconsIcon icon={EditUser02Icon} />
+                      Manage
+                    </Button>
+                  }
+                />
+                <TooltipContent>Manage members of this board</TooltipContent>
+              </Tooltip>
+            </BoardAdminGuard>
           </div>
         </div>
       </Header>
+
+      <div className="p-4">TODO: Columns will be here...</div>
 
       <BoardMembersDrawer
         isOpen={isMembersDrawerOpen}
