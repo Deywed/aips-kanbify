@@ -29,7 +29,7 @@ const BoardCard = ({ board }: BoardCardProps) => {
             className="group flex flex-1 flex-col gap-2"
           >
             <BoardRoleBadge role={board.role} />
-            <span className="underline-offset-4 group-hover:underline">
+            <span className="text-xl underline-offset-4 group-hover:underline">
               {board.title}
             </span>
           </Link>

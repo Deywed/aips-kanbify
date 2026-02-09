@@ -1,18 +1,26 @@
 import { useMemo } from 'react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { StarIcon } from '@hugeicons/core-free-icons';
+
 import { navigateTo } from '@/lib/navigation';
 import { cn, getAvatarFallback, getUserFullName } from '@/lib/utils';
 
-import type { User } from '@/types/auth.types';
+import type { BoardMember } from '@/types/auth.types';
 
 import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
 } from '@/components/ui/tooltip';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  Avatar,
+  AvatarBadge,
+  AvatarFallback,
+  AvatarImage,
+} from '@/components/ui/avatar';
 
 type UserAvatarProps = {
-  user: User;
+  user: BoardMember;
   size?: number;
   className?: string;
   showTooltip?: boolean;
@@ -42,6 +50,11 @@ const UserAvatar = ({
           alt={`${getUserFullName(user)} avatar`}
         />
         <AvatarFallback>{getAvatarFallback(user)}</AvatarFallback>
+        {user.role && user.role === 'ADMIN' && (
+          <AvatarBadge className="left-0 ring-1">
+            <HugeiconsIcon icon={StarIcon} />
+          </AvatarBadge>
+        )}
       </Avatar>
     ),
     [size, className, user],

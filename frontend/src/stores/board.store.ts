@@ -16,7 +16,11 @@ type BoardState = {
   // Real time actions for WebSocket updates
   addMember: (member: BoardMember) => void;
   removeMember: (userId: string) => void;
-  updateMemberRole: (userId: string, newRole: BoardRole) => void;
+  updateMemberRole: (
+    userId: string,
+    newRole: BoardRole,
+    isMe?: boolean,
+  ) => void;
   // TODO: add more actions for columns, cards, etc. as needed
 
   // Clean up board state when leaving the board page
@@ -59,12 +63,13 @@ export const useBoardStore = create<BoardState>((set) => ({
       };
     }),
 
-  updateMemberRole: (userId: string, newRole: BoardRole) =>
+  updateMemberRole: (userId: string, newRole: BoardRole, isMe?: boolean) =>
     set((state) => {
       if (!state.board) return {};
       return {
         board: {
           ...state.board,
+          role: isMe ? newRole : state.board.role,
           members: state.board.members.map((m) =>
             m.id === userId ? { ...m, role: newRole } : m,
           ),

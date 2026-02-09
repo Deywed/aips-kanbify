@@ -20,6 +20,7 @@ export class BoardEventsListener {
       SOCKET_EVENTS.BOARD.MEMBER_ADDED,
       {
         member: BoardMemberResponseDto.fromEntity(event.targetMember), // Send the full member info
+        actorId: event.changedByUserId,
       },
     );
   }
@@ -31,6 +32,7 @@ export class BoardEventsListener {
       SOCKET_EVENTS.BOARD.MEMBER_REMOVED,
       {
         userId: event.targetMember.user.id, // Removed user id
+        actorId: event.changedByUserId,
       },
     );
   }
@@ -43,6 +45,7 @@ export class BoardEventsListener {
       {
         userId: event.targetMember.user.id,
         newRole: event.role, // The new role of the user
+        actorId: event.changedByUserId,
       },
     );
   }

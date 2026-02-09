@@ -13,6 +13,8 @@ import {
 
 import { API_ENDPOINTS } from '@/config/endpoints';
 
+import { useBoardSocket } from '@/hooks/board/useBoardSocket';
+
 import { type BoardDetails } from '@/types/board.types';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -48,6 +50,9 @@ const BoardDetailsPage = () => {
     enabled: !!boardId,
   });
 
+  useBoardSocket(boardId); // Initialize board websocket connection
+
+  // Initialize zustand store
   useEffect(() => {
     if (isSuccess && data) {
       setBoard(data);

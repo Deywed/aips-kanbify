@@ -18,7 +18,7 @@ const BoardMemberNotification = ({
 }) => {
   return (
     <div className="flex gap-2">
-      <UserAvatar user={notification.triggeredBy} size={12} />
+      <UserAvatar user={notification.triggeredBy} size={10} />
       <div>
         <span
           className="hover:text-primary cursor-pointer font-bold underline-offset-4 hover:underline"
