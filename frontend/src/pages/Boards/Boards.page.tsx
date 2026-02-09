@@ -36,7 +36,7 @@ const BoardsPage = () => {
 
       <div className="size-full p-4">
         <BlockUI isLoading={isLoading} isError={isError} isEmpty={isEmpty}>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {data?.map((board) => (
               <BoardCard key={board.id} board={board} />
             ))}

@@ -13,6 +13,8 @@ import {
 
 import { API_ENDPOINTS } from '@/config/endpoints';
 
+import { useBoardSocket } from '@/hooks/board/useBoardSocket';
+
 import { type BoardDetails } from '@/types/board.types';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -48,6 +50,9 @@ const BoardDetailsPage = () => {
     enabled: !!boardId,
   });
 
+  useBoardSocket(boardId); // Initialize board websocket connection
+
+  // Initialize zustand store
   useEffect(() => {
     if (isSuccess && data) {
       setBoard(data);
@@ -70,7 +75,10 @@ const BoardDetailsPage = () => {
           <div className="flex items-center gap-2">
             <H3>
               {isLoading ? (
-                <Skeleton className="h-8 w-32" />
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-8 w-32" />
+                  <Skeleton className="h-5.5 w-16 rounded-2xl" />
+                </div>
               ) : isError ? (
                 'Board Not Found'
               ) : (

@@ -12,5 +12,5 @@ export type User = {
 };
 
 export type BoardMember = User & {
-  role: BoardRole;
+  role?: BoardRole;
 };

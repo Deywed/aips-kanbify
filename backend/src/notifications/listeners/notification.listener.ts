@@ -55,10 +55,10 @@ export class NotificationListener {
     event: BoardMemberEvent,
     type: NotificationType,
   ) {
-    const { boardId, targetUserId, changedByUserId, role } = event;
+    const { boardId, targetMember, changedByUserId, role } = event;
 
     const notification = this.notificationRepo.create({
-      user: { id: targetUserId },
+      user: { id: targetMember.user.id },
       triggeredBy: { id: changedByUserId },
       board: { id: boardId },
       payload: role ? { role } : null,
@@ -74,13 +74,13 @@ export class NotificationListener {
       });
 
       this.notificationsGateway.sendToUser(
-        targetUserId,
+        targetMember.user.id,
         SOCKET_EVENTS.NOTIFICATIONS.NEW,
         plainToInstance(Notification, fullNotification),
       );
     } catch (error) {
       this.logger.error(
-        `Failed to create notification for user ${targetUserId} about board ${boardId}: ${error.message}`,
+        `Failed to create notification for user ${targetMember.user.id} about board ${boardId}: ${error.message}`,
       );
     }
   }

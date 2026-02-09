@@ -68,7 +68,7 @@ export class BoardMembersService {
       await this.memberRepo.save(member);
       this.eventEmitter.emit(
         EVENTS.BOARD_MEMBER_ADDED,
-        new BoardMemberEvent(boardId, dto.userId, currentUserId, dto.role),
+        new BoardMemberEvent(boardId, member, currentUserId, dto.role),
       );
     } catch (error) {
       console.error(error);
@@ -117,7 +117,7 @@ export class BoardMembersService {
       const saved = await this.memberRepo.save(targetMember);
       this.eventEmitter.emit(
         EVENTS.BOARD_MEMBER_ROLE_UPDATED,
-        new BoardMemberEvent(boardId, targetUserId, requesterUserId, newRole),
+        new BoardMemberEvent(boardId, saved, requesterUserId, newRole),
       );
 
       return BoardMemberResponseDto.fromEntity(saved);
@@ -140,6 +140,7 @@ export class BoardMembersService {
         board: { id: boardId },
         user: { id: userId },
       },
+      relations: ['user'],
     });
 
     if (!member) {
@@ -150,7 +151,7 @@ export class BoardMembersService {
       await this.memberRepo.remove(member);
       this.eventEmitter.emit(
         EVENTS.BOARD_MEMBER_REMOVED,
-        new BoardMemberEvent(boardId, userId, currentUserId),
+        new BoardMemberEvent(boardId, member, currentUserId),
       );
     } catch (error) {
       console.error(error);
