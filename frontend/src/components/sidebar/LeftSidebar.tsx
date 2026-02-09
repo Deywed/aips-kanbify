@@ -44,7 +44,7 @@ const LeftSidebar = () => {
             <NavLink
               to={
                 link.to === APP_ROUTES.USERS && user
-                  ? `${APP_ROUTES.USERS}/${user.username}`
+                  ? APP_ROUTES.USER_DETAILS(user.id)
                   : link.to
               }
               key={link.label}

@@ -1,10 +1,13 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { io, Socket } from 'socket.io-client';
 import { toast } from 'sonner';
 
-import { API_BASE_URL } from '@/lib/axios';
+import { API_ENDPOINTS } from '@/config/endpoints';
 import { SOCKET_EVENTS } from '@/config/socketEvents';
+import {
+  connectNotificationsSocket,
+  disconnectNotificationsSocket,
+} from '@/lib/sockets/notificationsSocket';
 
 import type { Notification } from '@/types/notification.types';
 
@@ -15,11 +18,8 @@ import FloatingNotificationCard from '@/components/notifications/FloatingNotific
 
 export const useNotificationsSocket = () => {
   const queryClient = useQueryClient();
-
   const token = useAccessToken();
   const { incrementUnread } = useNotificationsActions();
-
-  const socketRef = useRef<Socket | null>(null);
 
   const showNotificationToast = (notification: Notification) => {
     toast.custom(
@@ -39,15 +39,7 @@ export const useNotificationsSocket = () => {
   useEffect(() => {
     if (!token) return;
 
-    const socket = io(`${API_BASE_URL}/notifications`, {
-      auth: { token },
-      transports: ['websocket'],
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-    });
-
-    socketRef.current = socket;
+    const socket = connectNotificationsSocket(token);
 
     socket.on('connect', () => {
       console.log('Connected to notifications websocket', socket.id);
@@ -64,10 +56,14 @@ export const useNotificationsSocket = () => {
     socket.on(SOCKET_EVENTS.NOTIFICATIONS.NEW, (notification: Notification) => {
       incrementUnread();
       showNotificationToast(notification);
+
+      queryClient.invalidateQueries({
+        queryKey: [API_ENDPOINTS.BOARDS],
+      });
     });
 
     return () => {
-      socket.disconnect();
+      disconnectNotificationsSocket();
     };
   }, [token, incrementUnread, queryClient]);
 };
