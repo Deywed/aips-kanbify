@@ -1,5 +1,3 @@
-// common/guards/board-role.guard.ts
-
 import {
   BadRequestException,
   CanActivate,
@@ -7,11 +5,14 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 
 import { Reflector } from '@nestjs/core';
 
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Socket } from 'socket.io';
 import { Repository } from 'typeorm';
 
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
@@ -26,6 +27,7 @@ import { BOARD_ROLES_KEY } from '../decorators/board-role.decorator';
 export class BoardRoleGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
+    private jwtService: JwtService,
 
     @InjectRepository(BoardMember)
     private readonly memberRepo: Repository<BoardMember>,
@@ -42,14 +44,7 @@ export class BoardRoleGuard implements CanActivate {
       return this.validateMembership(ctx);
     }
 
-    const request = ctx.switchToHttp().getRequest();
-
-    const user = request.user as JwtPayload;
-    const boardId = request.params.boardId ?? request.params.id;
-
-    if (!user || !boardId) {
-      throw new BadRequestException('User or board ID missing');
-    }
+    const { user, boardId } = await this.getAuthContext(ctx);
 
     const membership = await this.memberRepo.findOne({
       where: {
@@ -71,12 +66,7 @@ export class BoardRoleGuard implements CanActivate {
   }
 
   private async validateMembership(ctx: ExecutionContext): Promise<boolean> {
-    const request = ctx.switchToHttp().getRequest();
-
-    const user = request.user as JwtPayload;
-    const boardId = request.params.boardId ?? request.params.id;
-
-    if (!user || !boardId) return false;
+    const { user, boardId } = await this.getAuthContext(ctx);
 
     const exists = await this.memberRepo.exists({
       where: {
@@ -90,5 +80,44 @@ export class BoardRoleGuard implements CanActivate {
     }
 
     return true;
+  }
+
+  private async getAuthContext(
+    ctx: ExecutionContext,
+  ): Promise<{ user: JwtPayload; boardId: string }> {
+    if (ctx.getType() === 'ws') {
+      const client = ctx.switchToWs().getClient<Socket>();
+      const data = ctx.switchToWs().getData();
+
+      const token = client.handshake.auth?.token;
+      if (!token) throw new UnauthorizedException('Missing token');
+
+      let user: JwtPayload;
+      try {
+        user = (await this.jwtService.verifyAsync(token)) as JwtPayload;
+        client.data.user = user;
+      } catch (err) {
+        throw new UnauthorizedException('Invalid or expired token');
+      }
+
+      const boardId = data?.boardId;
+
+      if (!boardId) {
+        throw new BadRequestException('Board ID missing in payload');
+      }
+
+      return { user, boardId: String(boardId) };
+    }
+
+    // HTTP context
+    const request = ctx.switchToHttp().getRequest();
+    const user = request.user as JwtPayload;
+    const boardId = request.params.boardId ?? request.params.id;
+
+    if (!user || !boardId) {
+      throw new BadRequestException('User or board ID missing');
+    }
+
+    return { user, boardId };
   }
 }

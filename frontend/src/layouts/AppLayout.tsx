@@ -1,8 +1,21 @@
-import { Outlet } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+
+import { setNavigator } from '@/lib/navigation';
+
+import { useInitNotifications } from '@/hooks/notifications/useInitNotifications';
 
 import LeftSidebar from '@/components/sidebar/LeftSidebar';
 
 const AppLayout = () => {
+  useInitNotifications();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setNavigator(navigate);
+  }, [navigate]);
+
   return (
     <div className="flex">
       <LeftSidebar />

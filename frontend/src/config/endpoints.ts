@@ -15,4 +15,6 @@ export const API_ENDPOINTS = {
     `/board/${boardId}/members/${userId}`,
   UPDATE_BOARD_MEMBER_ROLE: (boardId: string, userId: string) =>
     `/board/${boardId}/members/${userId}/role`,
+
+  NOTIFICATIONS_UNREAD_COUNT: '/notifications/unread-count',
 };

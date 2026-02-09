@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { navigateTo } from '@/lib/navigation';
 import { cn, getAvatarFallback, getUserFullName } from '@/lib/utils';
 
 import type { User } from '@/types/auth.types';
@@ -24,8 +24,6 @@ const UserAvatar = ({
   className,
   showTooltip = false,
 }: UserAvatarProps) => {
-  const navigate = useNavigate();
-
   const avatar = useMemo(
     () => (
       <Avatar
@@ -36,7 +34,7 @@ const UserAvatar = ({
         )}
         onClick={(e) => {
           e.stopPropagation();
-          navigate(`/users/${user.id}`);
+          navigateTo(`/users/${user.id}`);
         }}
       >
         <AvatarImage
@@ -46,7 +44,7 @@ const UserAvatar = ({
         <AvatarFallback>{getAvatarFallback(user)}</AvatarFallback>
       </Avatar>
     ),
-    [size, className, user, navigate],
+    [size, className, user],
   );
 
   if (!showTooltip) {

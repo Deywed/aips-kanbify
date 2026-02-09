@@ -8,13 +8,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
+import { EVENTS } from 'src/common/constants/events.constants';
+import { BoardMemberEvent } from './events/board-member.event';
+
 import { BoardMember, BoardRole } from './entity/board-members.entity';
 import { Board } from 'src/board/entity/board.entity';
 import { User } from 'src/users/entity/user.entity';
 
-import { EVENTS } from 'src/common/constants/events.constants';
 import { AddMemberDto } from './dto/add-member.dto';
-import { BoardMemberAddedEvent } from './events/board-member-added.event';
 import { BoardMemberResponseDto } from './dto/board-member-response.dto';
 
 @Injectable()
@@ -67,7 +68,7 @@ export class BoardMembersService {
       await this.memberRepo.save(member);
       this.eventEmitter.emit(
         EVENTS.BOARD_MEMBER_ADDED,
-        new BoardMemberAddedEvent(boardId, dto.userId, currentUserId, dto.role),
+        new BoardMemberEvent(boardId, dto.userId, currentUserId, dto.role),
       );
     } catch (error) {
       console.error(error);
@@ -114,8 +115,10 @@ export class BoardMembersService {
     try {
       targetMember.role = newRole;
       const saved = await this.memberRepo.save(targetMember);
-
-      // TODO: Emit an event for role change
+      this.eventEmitter.emit(
+        EVENTS.BOARD_MEMBER_ROLE_UPDATED,
+        new BoardMemberEvent(boardId, targetUserId, requesterUserId, newRole),
+      );
 
       return BoardMemberResponseDto.fromEntity(saved);
     } catch (error) {
@@ -145,8 +148,10 @@ export class BoardMembersService {
 
     try {
       await this.memberRepo.remove(member);
-
-      // TODO: Emit an event for member removal
+      this.eventEmitter.emit(
+        EVENTS.BOARD_MEMBER_REMOVED,
+        new BoardMemberEvent(boardId, userId, currentUserId),
+      );
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(

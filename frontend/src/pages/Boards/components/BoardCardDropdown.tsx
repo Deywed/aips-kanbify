@@ -58,13 +58,15 @@ const BoardCardDropdown = ({ board }: BoardCardDropdownProps) => {
             <HugeiconsIcon icon={PencilEdit01Icon} />
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem
-            variant="destructive"
-            onClick={() => setIsDeleteDialogOpen(true)}
-          >
-            <HugeiconsIcon icon={Delete02Icon} />
-            Delete
-          </DropdownMenuItem>
+          {board.role === 'ADMIN' && (
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => setIsDeleteDialogOpen(true)}
+            >
+              <HugeiconsIcon icon={Delete02Icon} />
+              Delete
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
