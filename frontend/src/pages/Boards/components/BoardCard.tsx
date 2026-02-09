@@ -34,7 +34,7 @@ const BoardCard = ({ board }: BoardCardProps) => {
             </span>
           </Link>
 
-          <BoardCardDropdown board={board} />
+          {board.role === 'ADMIN' && <BoardCardDropdown board={board} />}
         </CardTitle>
         {board.description && (
           <CardDescription>{board.description}</CardDescription>

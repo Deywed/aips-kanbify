@@ -1,3 +1,6 @@
+import { HugeiconsIcon } from '@hugeicons/react';
+import { StarIcon } from '@hugeicons/core-free-icons';
+
 import type { BoardRole } from '@/types/board.types';
 
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +14,7 @@ const BoardRoleBadge = ({ role }: BoardRoleBadgeProps) => {
 
   return (
     <Badge variant={`${isAdminRole ? 'default' : 'secondary'}`}>
+      {isAdminRole && <HugeiconsIcon icon={StarIcon} />}
       {isAdminRole ? 'Admin' : 'Member'}
     </Badge>
   );

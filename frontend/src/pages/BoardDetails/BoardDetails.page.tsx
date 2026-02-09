@@ -75,7 +75,10 @@ const BoardDetailsPage = () => {
           <div className="flex items-center gap-2">
             <H3>
               {isLoading ? (
-                <Skeleton className="h-8 w-32" />
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-8 w-32" />
+                  <Skeleton className="h-5.5 w-16 rounded-2xl" />
+                </div>
               ) : isError ? (
                 'Board Not Found'
               ) : (
