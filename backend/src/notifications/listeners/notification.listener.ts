@@ -14,6 +14,7 @@ import {
 
 import { SOCKET_EVENTS } from 'src/common/constants/socket-events.constants';
 import { BoardMemberAddedEvent } from 'src/board-members/events/board-member-added.event';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class NotificationListener {
@@ -49,7 +50,7 @@ export class NotificationListener {
       this.notificationsGateway.sendToUser(
         targetUserId,
         SOCKET_EVENTS.NOTIFICATIONS.NEW,
-        fullNotification,
+        plainToInstance(Notification, fullNotification),
       );
     } catch (error) {
       this.logger.error(

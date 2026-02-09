@@ -4,12 +4,15 @@ export const BOARD_ROLES = ['ADMIN', 'MEMBER'] as const;
 
 export type BoardRole = (typeof BOARD_ROLES)[number];
 
-export type Board = {
+export type BoardBase = {
   id: string;
   createdAt: string;
   updatedAt: string;
   title: string;
   description?: string;
+};
+
+export type Board = BoardBase & {
   role: BoardRole;
   members: BoardMember[];
 };
