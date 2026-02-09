@@ -31,7 +31,7 @@ export class BoardEventsListener {
       event.boardId,
       SOCKET_EVENTS.BOARD.MEMBER_REMOVED,
       {
-        userId: event.targetMember.user.id, // Removed user id
+        member: BoardMemberResponseDto.fromEntity(event.targetMember), // Send the full member info
         actorId: event.changedByUserId,
       },
     );

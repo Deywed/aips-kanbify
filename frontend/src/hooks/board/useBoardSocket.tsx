@@ -2,13 +2,14 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import { getUserFullName } from '@/lib/utils';
-
 import { APP_ROUTES } from '@/config/appRoutes';
 import { SOCKET_EVENTS } from '@/config/socketEvents';
 
-import type { BoardMember } from '@/types/auth.types';
-import type { BoardRole } from '@/types/board.types';
+import type {
+  BoardMemberAddedPayload,
+  BoardMemberRemovedPayload,
+  BoardMemberRoleUpdatedPayload,
+} from '@/types/socket-events.types';
 
 import {
   connectBoardSocket,
@@ -48,34 +49,35 @@ export const useBoardSocket = (boardId?: string) => {
 
     socket.on(
       SOCKET_EVENTS.BOARD.MEMBER_ADDED,
-      (payload: { member: BoardMember; actorId: string }) => {
+      (payload: BoardMemberAddedPayload) => {
         addMember(payload.member);
 
         if (payload.actorId !== currentUser?.id) {
-          toast.info(
-            `${getUserFullName(payload.member)} has joined the board`,
-            {
-              position: 'bottom-right',
-            },
-          );
+          toast.info(`@${payload.member.username} has been added to the board`);
         }
       },
     );
 
     socket.on(
       SOCKET_EVENTS.BOARD.MEMBER_REMOVED,
-      (payload: { userId: string }) => {
-        removeMember(payload.userId);
+      (payload: BoardMemberRemovedPayload) => {
+        removeMember(payload.member.id);
 
-        if (payload.userId === currentUser?.id) {
-          navigate(APP_ROUTES.BOARDS, { replace: true });
+        if (payload.member.id === currentUser?.id) {
+          return navigate(APP_ROUTES.BOARDS, { replace: true });
+        }
+
+        if (payload.actorId !== currentUser?.id) {
+          toast.info(
+            `@${payload.member.username} has been removed from the board`,
+          );
         }
       },
     );
 
     socket.on(
       SOCKET_EVENTS.BOARD.MEMBER_ROLE_UPDATED,
-      (payload: { userId: string; newRole: BoardRole }) => {
+      (payload: BoardMemberRoleUpdatedPayload) => {
         updateMemberRole(
           payload.userId,
           payload.newRole,
