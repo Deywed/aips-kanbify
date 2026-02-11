@@ -1,18 +1,26 @@
 import type { ReactNode } from 'react';
-import { Cancel01Icon } from '@hugeicons/core-free-icons';
-
 import { cn } from '@/lib/utils';
 
-import EmptyState from '@/components/common/EmptyState';
 import { LoadingSwap } from '@/components/ui/loading-swap';
+
+import EmptyState from '@/components/common/EmptyState';
+import ErrorState from '@/components/common/ErrorState';
+
+type StateOverrides = {
+  empty?: ReactNode;
+  error?: ReactNode;
+  loading?: ReactNode;
+};
 
 type Props = {
   isLoading: boolean;
-  isError?: boolean;
+  isError?: boolean | unknown;
   isEmpty?: boolean;
-  empty?: ReactNode;
-  error?: ReactNode;
+  emptyContent?: ReactNode;
+
   children: ReactNode;
+
+  overrides?: StateOverrides;
   className?: string;
 };
 
@@ -20,39 +28,39 @@ const BlockUI = ({
   isLoading,
   isError = false,
   isEmpty = false,
-  empty,
-  error,
+  emptyContent,
   children,
+  overrides,
   className,
 }: Props) => {
   if (isLoading) {
     return (
-      <div className={cn('w-full', className)}>
-        <LoadingSwap isLoading>{children}</LoadingSwap>
+      <div className={cn('flex h-full w-full justify-center', className)}>
+        {overrides?.loading ? (
+          overrides.loading
+        ) : (
+          <LoadingSwap isLoading>{children}</LoadingSwap>
+        )}
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className={cn('w-full', className)}>
-        {error === undefined ? (
-          <EmptyState
-            icon={Cancel01Icon}
-            title="Something went wrong"
-            description="Please try again in a moment."
-          />
-        ) : (
-          error
-        )}
+      <div className={cn('flex h-full w-full justify-center', className)}>
+        {overrides?.error ? overrides.error : <ErrorState />}
       </div>
     );
   }
 
   if (isEmpty) {
     return (
-      <div className={cn('w-full', className)}>
-        {empty === undefined ? <EmptyState title="Nothing to show" /> : empty}
+      <div className={cn('flex h-full w-full justify-center', className)}>
+        {overrides?.empty ? (
+          overrides.empty
+        ) : (
+          <EmptyState title="No data found" content={emptyContent} />
+        )}
       </div>
     );
   }

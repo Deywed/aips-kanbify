@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
 
@@ -16,6 +17,10 @@ import { Card } from 'src/card/entity/card.entity';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { UpdateColumnDto } from './dto/update-column.dto';
 import { ReorderColumnDto } from './dto/reorder-column.dto';
+import { EVENTS } from 'src/common/constants/events.constants';
+import { BoardColumnAddedEvent } from './events/board-column-added.event';
+import { BoardColumnRemovedEvent } from './events/board-column-removed.event';
+import { BoardColumnUpdatedEvent } from './events/board-column-updated.event';
 
 @Injectable()
 export class BoardColumnService {
@@ -26,9 +31,14 @@ export class BoardColumnService {
     private readonly boardRepo: Repository<Board>,
     @InjectRepository(Card)
     private readonly cardRepo: Repository<Card>,
+    private eventEmitter: EventEmitter2,
   ) {}
 
-  async createColumn(boardId: string, dto: CreateColumnDto) {
+  async createColumn(
+    boardId: string,
+    dto: CreateColumnDto,
+    currentUserId: string,
+  ) {
     const board = await this.boardRepo.findOneBy({ id: boardId });
 
     if (!board) {
@@ -44,7 +54,9 @@ export class BoardColumnService {
       },
     });
 
-    const position = lastColumn ? Number(lastColumn.position) + 1 : 1;
+    const position = lastColumn
+      ? Number(lastColumn.position) + POSITION_GAP
+      : POSITION_GAP;
 
     const column = this.columnRepo.create({
       title: dto.title,
@@ -53,20 +65,27 @@ export class BoardColumnService {
     });
 
     try {
-      await this.columnRepo.save(column);
+      const saved = await this.columnRepo.save(column);
+      this.eventEmitter.emit(
+        EVENTS.BOARD_COLUMN_ADDED,
+        new BoardColumnAddedEvent(saved, currentUserId),
+      );
+      return saved;
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException('Failed to create column');
     }
-
-    return column;
   }
 
-  async removeColumn(boardId: string, columnId: string) {
+  async removeColumn(boardId: string, columnId: string, currentUserId: string) {
     const column = await this.getColumnById(boardId, columnId);
 
     try {
       await this.columnRepo.remove(column);
+      this.eventEmitter.emit(
+        EVENTS.BOARD_COLUMN_REMOVED,
+        new BoardColumnRemovedEvent(boardId, columnId, currentUserId),
+      );
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException('Failed to remove column');
@@ -75,19 +94,32 @@ export class BoardColumnService {
     return { id: columnId };
   }
 
-  async updateColumn(boardId: string, columnId: string, dto: UpdateColumnDto) {
+  async updateColumn(
+    boardId: string,
+    columnId: string,
+    dto: UpdateColumnDto,
+    currentUserId: string,
+  ) {
     const column = await this.getColumnById(boardId, columnId);
 
     Object.assign(column, dto);
 
     try {
-      await this.columnRepo.save(column);
+      const saved = await this.columnRepo.save(column);
+      this.eventEmitter.emit(
+        EVENTS.BOARD_COLUMN_UPDATED,
+        new BoardColumnUpdatedEvent(
+          boardId,
+          columnId,
+          saved.title,
+          currentUserId,
+        ),
+      );
+      return saved;
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException('Failed to update column');
     }
-
-    return column;
   }
 
   async reorderColumnAfter(

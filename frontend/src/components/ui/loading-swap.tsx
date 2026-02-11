@@ -7,10 +7,12 @@ export function LoadingSwap({
   isLoading,
   children,
   className,
+  loaderClassName,
 }: {
   isLoading: boolean;
   children: ReactNode;
   className?: string;
+  loaderClassName?: string;
 }) {
   return (
     <div className="grid grid-cols-1 items-center justify-items-center">
@@ -30,7 +32,7 @@ export function LoadingSwap({
           className,
         )}
       >
-        <Spinner />
+        <Spinner className={loaderClassName} />
       </div>
     </div>
   );

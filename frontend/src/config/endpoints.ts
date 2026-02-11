@@ -10,6 +10,10 @@ export const API_ENDPOINTS = {
   BOARDS: '/board',
   BOARD: (boardId: string) => `/board/${boardId}`,
 
+  BOARD_COLUMNS: (boardId: string) => `/board/${boardId}/columns`,
+  BOARD_COLUMN: (boardId: string, columnId: string) =>
+    `/board/${boardId}/columns/${columnId}`,
+
   ADD_BOARD_MEMBER: (boardId: string) => `/board/${boardId}/members`,
   DELETE_BOARD_MEMBER: (boardId: string, userId: string) =>
     `/board/${boardId}/members/${userId}`,

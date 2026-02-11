@@ -152,6 +152,14 @@ export class BoardService {
         'columns.cards.createdBy',
         'members.user',
       ],
+      order: {
+        columns: {
+          position: 'ASC',
+          cards: {
+            position: 'ASC',
+          },
+        },
+      },
     });
 
     if (!board) {

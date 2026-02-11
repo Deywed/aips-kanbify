@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 
 import type { BoardMember } from '@/types/auth.types';
-import type { BoardDetails, BoardRole } from '@/types/board.types';
+import type { BoardDetails, BoardRole, Column } from '@/types/board.types';
 
 type BoardState = {
   // State
@@ -21,6 +21,9 @@ type BoardState = {
     newRole: BoardRole,
     isMe?: boolean,
   ) => void;
+  addColumn: (column: Column) => void;
+  removeColumn: (columnId: string) => void;
+  updateColumnTitle: (columnId: string, newTitle: string) => void;
   // TODO: add more actions for columns, cards, etc. as needed
 
   // Clean up board state when leaving the board page
@@ -32,12 +35,13 @@ const EMPTY_COLUMNS: BoardDetails['columns'] = [];
 
 export const useBoardStore = create<BoardState>((set) => ({
   board: null,
-  isLoading: false,
+  isLoading: true,
 
   setBoard: (board) => set({ board, isLoading: false }),
 
   setLoading: (isLoading) => set({ isLoading }),
 
+  // Board member actions
   addMember: (member) =>
     set((state) => {
       if (!state.board) return {};
@@ -77,6 +81,48 @@ export const useBoardStore = create<BoardState>((set) => ({
       };
     }),
 
+  // Column actions
+  addColumn: (column: Column) =>
+    set((state) => {
+      if (!state.board) return {};
+      return {
+        board: {
+          ...state.board,
+          columns: [
+            ...state.board.columns,
+            {
+              ...column,
+              cards: [],
+            },
+          ],
+        },
+      };
+    }),
+
+  removeColumn: (columnId: string) =>
+    set((state) => {
+      if (!state.board) return {};
+      return {
+        board: {
+          ...state.board,
+          columns: state.board.columns.filter((c) => c.id !== columnId),
+        },
+      };
+    }),
+
+  updateColumnTitle: (columnId: string, newTitle: string) =>
+    set((state) => {
+      if (!state.board) return {};
+      return {
+        board: {
+          ...state.board,
+          columns: state.board.columns.map((c) =>
+            c.id === columnId ? { ...c, title: newTitle } : c,
+          ),
+        },
+      };
+    }),
+
   resetBoard: () => set({ board: null, isLoading: false }),
 }));
 
@@ -110,6 +156,9 @@ export const useBoardActions = () =>
       addMember: state.addMember,
       removeMember: state.removeMember,
       updateMemberRole: state.updateMemberRole,
+      addColumn: state.addColumn,
+      removeColumn: state.removeColumn,
+      updateColumnTitle: state.updateColumnTitle,
       resetBoard: state.resetBoard,
     })),
   );

@@ -20,7 +20,7 @@ const AppLayout = () => {
     <div className="flex">
       <LeftSidebar />
 
-      <main className="flex size-full flex-1 flex-col">
+      <main className="flex min-w-0 flex-1 flex-col">
         <Outlet />
       </main>
     </div>

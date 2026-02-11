@@ -31,7 +31,10 @@ import BoardRoleBadge from '@/components/board/BoardRoleBadge';
 import BoardMembersAvatars from '@/components/board/BoardMembersAvatars';
 import { BoardAdminGuard } from '@/components/guards/BoardAdminGuard';
 
+import SearchInput from '@/components/common/SearchInput';
+
 import BoardMembersDrawer from './components/BoardMembersDrawer';
+import BoardColumns from './components/column/BoardColumns';
 
 const BoardDetailsPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
@@ -40,7 +43,7 @@ const BoardDetailsPage = () => {
   const queryClient = useQueryClient();
 
   // Zustand hooks
-  const { setBoard, resetBoard } = useBoardActions();
+  const { setBoard, setLoading, resetBoard } = useBoardActions();
   const boardInfo = useBoardInfo();
   const members = useBoardMembers();
   const currentUserRole = useUserBoardRole();
@@ -51,6 +54,11 @@ const BoardDetailsPage = () => {
   });
 
   useBoardSocket(boardId); // Initialize board websocket connection
+
+  // Sync loading state with React Query
+  useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading, setLoading]);
 
   // Initialize zustand store
   useEffect(() => {
@@ -80,7 +88,7 @@ const BoardDetailsPage = () => {
                   <Skeleton className="h-5.5 w-16 rounded-2xl" />
                 </div>
               ) : isError ? (
-                'Board Not Found'
+                'Error loading board'
               ) : (
                 boardInfo.title
               )}
@@ -112,7 +120,12 @@ const BoardDetailsPage = () => {
         </div>
       </Header>
 
-      <div className="p-4">TODO: Columns will be here...</div>
+      <div className="flex h-full min-w-0 flex-col gap-4 overflow-hidden p-4">
+        <div className="w-fit">
+          <SearchInput disabled={isLoading || isError} />
+        </div>
+        <BoardColumns isError={isError} />
+      </div>
 
       <BoardMembersDrawer
         isOpen={isMembersDrawerOpen}

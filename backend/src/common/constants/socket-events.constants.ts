@@ -8,5 +8,8 @@ export const SOCKET_EVENTS = {
     MEMBER_ADDED: 'board:memberAdded',
     MEMBER_REMOVED: 'board:memberRemoved',
     MEMBER_ROLE_UPDATED: 'board:memberRoleUpdated',
+    COLUMN_ADDED: 'board:columnAdded',
+    COLUMN_REMOVED: 'board:columnRemoved',
+    COLUMN_UPDATED: 'board:columnUpdated',
   },
 } as const;

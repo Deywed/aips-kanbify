@@ -33,7 +33,7 @@ const LeftSidebar = () => {
   const unreadCount = useUnreadNotificationsCount();
 
   return (
-    <aside className="sticky top-0 flex h-screen min-w-64 flex-col gap-8 border-r p-4">
+    <aside className="sticky top-0 flex h-screen w-64 flex-col gap-8 border-r p-4">
       <Logo size={54} className="ml-2" />
 
       <nav className="flex flex-col gap-2">

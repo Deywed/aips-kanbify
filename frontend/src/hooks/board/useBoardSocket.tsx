@@ -6,6 +6,9 @@ import { APP_ROUTES } from '@/config/appRoutes';
 import { SOCKET_EVENTS } from '@/config/socketEvents';
 
 import type {
+  BoardColumnAddedPayload,
+  BoardColumnRemovedPayload,
+  BoardColumnUpdatedPayload,
   BoardMemberAddedPayload,
   BoardMemberRemovedPayload,
   BoardMemberRoleUpdatedPayload,
@@ -28,7 +31,14 @@ export const useBoardSocket = (boardId?: string) => {
   const token = useAccessToken();
   const currentUser = useAuthUser();
 
-  const { addMember, removeMember, updateMemberRole } = useBoardActions();
+  const {
+    addMember,
+    removeMember,
+    updateMemberRole,
+    addColumn,
+    removeColumn,
+    updateColumnTitle,
+  } = useBoardActions();
 
   useEffect(() => {
     if (!token || !boardId) return;
@@ -86,6 +96,31 @@ export const useBoardSocket = (boardId?: string) => {
       },
     );
 
+    socket.on(
+      SOCKET_EVENTS.BOARD.COLUMN_ADDED,
+      (payload: BoardColumnAddedPayload) => {
+        if (payload.actorId !== currentUser?.id) {
+          addColumn(payload.column);
+          toast.info(`Column "${payload.column.title}" has been added`);
+        }
+      },
+    );
+
+    socket.on(
+      SOCKET_EVENTS.BOARD.COLUMN_REMOVED,
+      (payload: BoardColumnRemovedPayload) => {
+        if (payload.actorId !== currentUser?.id) removeColumn(payload.columnId);
+      },
+    );
+
+    socket.on(
+      SOCKET_EVENTS.BOARD.COLUMN_UPDATED,
+      (payload: BoardColumnUpdatedPayload) => {
+        if (payload.actorId !== currentUser?.id)
+          updateColumnTitle(payload.columnId, payload.title);
+      },
+    );
+
     return () => {
       leaveBoardRoom(boardId);
       const activeSocket = getBoardSocket();
@@ -93,6 +128,9 @@ export const useBoardSocket = (boardId?: string) => {
         activeSocket.off(SOCKET_EVENTS.BOARD.MEMBER_ADDED);
         activeSocket.off(SOCKET_EVENTS.BOARD.MEMBER_REMOVED);
         activeSocket.off(SOCKET_EVENTS.BOARD.MEMBER_ROLE_UPDATED);
+        activeSocket.off(SOCKET_EVENTS.BOARD.COLUMN_ADDED);
+        activeSocket.off(SOCKET_EVENTS.BOARD.COLUMN_REMOVED);
+        activeSocket.off(SOCKET_EVENTS.BOARD.COLUMN_UPDATED);
         activeSocket.off('connect');
         activeSocket.off('disconnect');
         activeSocket.off('connect_error');
@@ -107,5 +145,8 @@ export const useBoardSocket = (boardId?: string) => {
     addMember,
     currentUser?.id,
     navigate,
+    addColumn,
+    removeColumn,
+    updateColumnTitle,
   ]);
 };

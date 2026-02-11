@@ -7,8 +7,10 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
+import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
 
 import { BoardRoleGuard } from 'src/common/guards/board-role.guard';
 import { BoardRoleDecorator } from 'src/common/decorators/board-role.decorator';
@@ -27,28 +29,34 @@ export class BoardColumnController {
 
   @Post()
   createColumn(
+    @Req() req,
     @Param('boardId', ParseUUIDPipe) boardId: string,
     @Body() dto: CreateColumnDto,
   ) {
-    return this.columnService.createColumn(boardId, dto);
+    const user = req['user'] as JwtPayload;
+    return this.columnService.createColumn(boardId, dto, user.sub);
   }
 
   @Delete(':columnId')
   @BoardRoleDecorator(BoardRole.ADMIN)
   removeColumn(
+    @Req() req,
     @Param('boardId', ParseUUIDPipe) boardId: string,
     @Param('columnId', ParseUUIDPipe) columnId: string,
   ) {
-    return this.columnService.removeColumn(boardId, columnId);
+    const user = req['user'] as JwtPayload;
+    return this.columnService.removeColumn(boardId, columnId, user.sub);
   }
 
   @Patch(':columnId')
   updateColumn(
+    @Req() req,
     @Param('boardId', ParseUUIDPipe) boardId: string,
     @Param('columnId', ParseUUIDPipe) columnId: string,
     @Body() dto: UpdateColumnDto,
   ) {
-    return this.columnService.updateColumn(boardId, columnId, dto);
+    const user = req['user'] as JwtPayload;
+    return this.columnService.updateColumn(boardId, columnId, dto, user.sub);
   }
 
   @Patch(':columnId/reorder')
