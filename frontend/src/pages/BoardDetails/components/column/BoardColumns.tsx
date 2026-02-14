@@ -14,6 +14,7 @@ import BlockUI from '@/components/common/BlockUI';
 import BoardColumnDialog from './BoardColumnDialog';
 import BoardColumnDropdown from './BoardColumnDropdown';
 import ColumnCards from '../ColumnCards';
+import { BoardAdminGuard } from '@/components/guards/BoardAdminGuard';
 
 type BoardColumnsProps = {
   isError?: boolean;
@@ -52,7 +53,9 @@ const BoardColumns = ({ isError }: BoardColumnsProps) => {
                     <H4>{column.title}</H4>
                     <Badge>{column.cards.length}</Badge>
                   </div>
-                  <BoardColumnDropdown column={column} />
+                  <BoardAdminGuard>
+                    <BoardColumnDropdown column={column} />
+                  </BoardAdminGuard>
                 </div>
 
                 <ColumnCards columnId={column.id} cards={column.cards} />
@@ -60,7 +63,7 @@ const BoardColumns = ({ isError }: BoardColumnsProps) => {
             ))}
 
             <div
-              className="text-muted-foreground hover:bg-card/50 hover:text-foreground flex h-21 w-xs cursor-pointer items-center justify-center gap-2 rounded-md border shadow transition-colors hover:border-solid dark:border-dashed"
+              className="text-muted-foreground hover:bg-card/50 hover:text-foreground flex h-30 w-xs cursor-pointer items-center justify-center gap-2 rounded-md border shadow transition-colors hover:border-solid dark:border-dashed"
               onClick={() => setIsAddColumnOpen(true)}
             >
               <HugeiconsIcon icon={Add01Icon} size={16} /> Add column

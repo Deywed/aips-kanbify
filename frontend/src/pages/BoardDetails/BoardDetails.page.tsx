@@ -31,10 +31,9 @@ import BoardRoleBadge from '@/components/board/BoardRoleBadge';
 import BoardMembersAvatars from '@/components/board/BoardMembersAvatars';
 import { BoardAdminGuard } from '@/components/guards/BoardAdminGuard';
 
-import SearchInput from '@/components/common/SearchInput';
-
 import BoardMembersDrawer from './components/BoardMembersDrawer';
 import BoardColumns from './components/column/BoardColumns';
+import BoardFilters from './components/board-filters/BoardFilters';
 
 const BoardDetailsPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
@@ -121,9 +120,14 @@ const BoardDetailsPage = () => {
       </Header>
 
       <div className="flex h-full min-w-0 flex-col gap-4 overflow-hidden p-4">
-        <div className="w-fit">
-          <SearchInput disabled={isLoading || isError} />
-        </div>
+        {isLoading ? (
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-9 w-53" />
+            <Skeleton className="h-9 w-18" />
+          </div>
+        ) : (
+          <BoardFilters />
+        )}
         <BoardColumns isError={isError} />
       </div>
 

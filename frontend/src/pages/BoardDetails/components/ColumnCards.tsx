@@ -1,6 +1,11 @@
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Add01Icon } from '@hugeicons/core-free-icons';
+
 import { formatDate } from '@/lib/utils';
 
 import type { Card } from '@/types/board.types';
+
+import { Button } from '@/components/ui/button';
 
 import UserAvatar from '@/components/common/UserAvatar';
 
@@ -32,6 +37,10 @@ const ColumnCards = ({ columnId, cards }: ColumnCardsProps) => {
           </div>
         </div>
       ))}
+
+      <Button variant="ghost" className="">
+        <HugeiconsIcon icon={Add01Icon} size={16} /> Add card
+      </Button>
     </div>
   );
 };

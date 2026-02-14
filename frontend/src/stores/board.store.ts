@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 
 import type { BoardMember } from '@/types/auth.types';
-import type { BoardDetails, BoardRole, Column } from '@/types/board.types';
+import type { BoardDetails, BoardRole, Column, Tag } from '@/types/board.types';
 
 type BoardState = {
   // State
@@ -24,6 +24,9 @@ type BoardState = {
   addColumn: (column: Column) => void;
   removeColumn: (columnId: string) => void;
   updateColumnTitle: (columnId: string, newTitle: string) => void;
+  addTag: (tag: Tag) => void;
+  deleteTag: (tagId: string) => void;
+  updateTag: (tagId: string, newName: string) => void;
   // TODO: add more actions for columns, cards, etc. as needed
 
   // Clean up board state when leaving the board page
@@ -32,6 +35,7 @@ type BoardState = {
 
 const EMPTY_MEMBERS: BoardMember[] = [];
 const EMPTY_COLUMNS: BoardDetails['columns'] = [];
+const EMPTY_TAGS: BoardDetails['tags'] = [];
 
 export const useBoardStore = create<BoardState>((set) => ({
   board: null,
@@ -123,6 +127,41 @@ export const useBoardStore = create<BoardState>((set) => ({
       };
     }),
 
+  addTag: (tag: Tag) =>
+    set((state) => {
+      if (!state.board) return {};
+      return {
+        board: {
+          ...state.board,
+          tags: [...state.board.tags, tag],
+        },
+      };
+    }),
+
+  deleteTag: (tagId: string) =>
+    set((state) => {
+      if (!state.board) return {};
+      return {
+        board: {
+          ...state.board,
+          tags: state.board.tags.filter((t) => t.id !== tagId),
+        },
+      };
+    }),
+
+  updateTag: (tagId: string, newName: string) =>
+    set((state) => {
+      if (!state.board) return {};
+      return {
+        board: {
+          ...state.board,
+          tags: state.board.tags.map((t) =>
+            t.id === tagId ? { ...t, name: newName } : t,
+          ),
+        },
+      };
+    }),
+
   resetBoard: () => set({ board: null, isLoading: false }),
 }));
 
@@ -142,6 +181,9 @@ export const useBoardMembers = () =>
 export const useBoardColumns = () =>
   useBoardStore((state) => state.board?.columns ?? EMPTY_COLUMNS);
 
+export const useBoardTags = () =>
+  useBoardStore((state) => state.board?.tags ?? EMPTY_TAGS);
+
 export const useUserBoardRole = () =>
   useBoardStore((state) => state.board?.role);
 
@@ -159,6 +201,9 @@ export const useBoardActions = () =>
       addColumn: state.addColumn,
       removeColumn: state.removeColumn,
       updateColumnTitle: state.updateColumnTitle,
+      addTag: state.addTag,
+      deleteTag: state.deleteTag,
+      updateTag: state.updateTag,
       resetBoard: state.resetBoard,
     })),
   );
