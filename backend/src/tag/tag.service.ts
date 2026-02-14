@@ -78,13 +78,12 @@ export class TagService {
     Object.assign(tag, dto);
 
     try {
-      await this.tagRepository.save(tag);
+      const saved = await this.tagRepository.save(tag);
+      return saved;
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException('Failed to update tag');
     }
-
-    return tag;
   }
 
   async validateAndGetTags(boardId: string, tagIds?: string[]): Promise<Tag[]> {

@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Delete02Icon, TagIcon, TagsIcon } from '@hugeicons/core-free-icons';
+import {
+  Cancel01Icon,
+  Delete02Icon,
+  Edit02Icon,
+  TagIcon,
+  TagsIcon,
+  Tick01Icon,
+} from '@hugeicons/core-free-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 
@@ -11,6 +18,7 @@ import { useBoardInfo, useBoardTags } from '@/stores/board.store';
 
 import { useCreateTagMutation } from '@/mutations/tags/useCreateTagMutation';
 import { useDeleteTagMutation } from '@/mutations/tags/useDeleteTagMutation';
+import { useUpdateTagMutation } from '@/mutations/tags/useUpdateTagMutation';
 
 import type { Tag } from '@/types/board.types';
 
@@ -25,10 +33,16 @@ import {
 } from '@/components/ui/dialog';
 import FormInput from '@/components/form/FormInput';
 import { FieldGroup } from '@/components/ui/field';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@/components/ui/input-group';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { LoadingSwap } from '@/components/ui/loading-swap';
 
 import DeleteConfirmDialog from '@/components/common/DeleteConfirmDialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 const TagsDialog = () => {
   const boardTags = useBoardTags();
@@ -103,7 +117,15 @@ type TagItemProps = {
 
 const TagItem = ({ tag }: TagItemProps) => {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isEditMode, setEditMode] = useState(false);
+  const [editValue, setEditValue] = useState(tag.name);
+
   const boardInfo = useBoardInfo();
+
+  const { mutate: updateTag, isPending: isUpdating } = useUpdateTagMutation(
+    boardInfo.id || '',
+    tag.id,
+  );
 
   const { mutate: deleteTag, isPending } = useDeleteTagMutation(
     boardInfo.id || '',
@@ -118,20 +140,93 @@ const TagItem = ({ tag }: TagItemProps) => {
     });
   };
 
+  const handleUpdateTag = (name: string) => {
+    if (name === tag.name || name.trim() === '') {
+      setEditMode(false);
+      return;
+    }
+
+    updateTag(
+      { name },
+      {
+        onSuccess: (tag) => {
+          toast.success(`Tag renamed to "${name}"`);
+          setEditMode(false);
+          setEditValue(tag.name);
+        },
+      },
+    );
+  };
+
   return (
     <>
-      <div className="bg-card flex items-center gap-2 rounded-md border p-4">
-        <HugeiconsIcon icon={TagIcon} size={16} />
-        <span>{tag.name}</span>
+      <div className="bg-card flex items-center gap-4 rounded-md border p-4">
+        <HugeiconsIcon
+          icon={TagIcon}
+          size={16}
+          className="text-muted-foreground shrink-0"
+        />
+        {isEditMode ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleUpdateTag(editValue);
+            }}
+            className="w-full"
+          >
+            <InputGroup>
+              <InputGroupInput
+                defaultValue={tag.name}
+                autoFocus
+                onChange={(e) => setEditValue(e.target.value)}
+              />
 
-        <Button
-          variant="destructive"
-          size="icon-sm"
-          className="ml-auto"
-          onClick={() => setDeleteDialogOpen(true)}
-        >
-          <HugeiconsIcon icon={Delete02Icon} />
-        </Button>
+              <InputGroupAddon align="inline-end" className="gap-1">
+                <InputGroupButton
+                  variant="outline"
+                  size="icon-xs"
+                  disabled={isUpdating}
+                  type="submit"
+                >
+                  <LoadingSwap isLoading={isUpdating}>
+                    <HugeiconsIcon icon={Tick01Icon} />
+                  </LoadingSwap>
+                </InputGroupButton>
+
+                <InputGroupButton
+                  variant="outline"
+                  size="icon-xs"
+                  type="button"
+                  onClick={() => setEditMode(false)}
+                >
+                  <HugeiconsIcon icon={Cancel01Icon} />
+                </InputGroupButton>
+              </InputGroupAddon>
+            </InputGroup>
+          </form>
+        ) : (
+          <div
+            onClick={() => setEditMode(true)}
+            className="group flex flex-1 cursor-pointer items-center gap-2"
+          >
+            <span>{tag.name}</span>
+            <HugeiconsIcon
+              icon={Edit02Icon}
+              size={16}
+              className="hidden group-hover:block"
+            />
+          </div>
+        )}
+
+        {!isEditMode && (
+          <Button
+            variant="destructive"
+            size="icon-sm"
+            onClick={() => setDeleteDialogOpen(true)}
+          >
+            <HugeiconsIcon icon={Delete02Icon} />
+          </Button>
+        )}
       </div>
 
       <DeleteConfirmDialog

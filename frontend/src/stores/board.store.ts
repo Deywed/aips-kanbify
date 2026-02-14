@@ -26,6 +26,7 @@ type BoardState = {
   updateColumnTitle: (columnId: string, newTitle: string) => void;
   addTag: (tag: Tag) => void;
   deleteTag: (tagId: string) => void;
+  updateTag: (tagId: string, newName: string) => void;
   // TODO: add more actions for columns, cards, etc. as needed
 
   // Clean up board state when leaving the board page
@@ -148,6 +149,19 @@ export const useBoardStore = create<BoardState>((set) => ({
       };
     }),
 
+  updateTag: (tagId: string, newName: string) =>
+    set((state) => {
+      if (!state.board) return {};
+      return {
+        board: {
+          ...state.board,
+          tags: state.board.tags.map((t) =>
+            t.id === tagId ? { ...t, name: newName } : t,
+          ),
+        },
+      };
+    }),
+
   resetBoard: () => set({ board: null, isLoading: false }),
 }));
 
@@ -189,6 +203,7 @@ export const useBoardActions = () =>
       updateColumnTitle: state.updateColumnTitle,
       addTag: state.addTag,
       deleteTag: state.deleteTag,
+      updateTag: state.updateTag,
       resetBoard: state.resetBoard,
     })),
   );
