@@ -151,6 +151,7 @@ export class BoardService {
         'columns.cards.assignedTo',
         'columns.cards.createdBy',
         'members.user',
+        'tags',
       ],
       order: {
         columns: {

@@ -19,6 +19,7 @@ export type Board = BoardBase & {
 
 export type BoardDetails = Board & {
   columns: Column[];
+  tags: Tag[];
 };
 
 export type Column = {

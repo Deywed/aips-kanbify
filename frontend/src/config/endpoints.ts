@@ -20,5 +20,11 @@ export const API_ENDPOINTS = {
   UPDATE_BOARD_MEMBER_ROLE: (boardId: string, userId: string) =>
     `/board/${boardId}/members/${userId}/role`,
 
+  ADD_TAG: (boardId: string) => `/board/${boardId}/tags`,
+  DELETE_TAG: (boardId: string, tagId: string) =>
+    `/board/${boardId}/tags/${tagId}`,
+  UPDATE_TAG: (boardId: string, tagId: string) =>
+    `/board/${boardId}/tags/${tagId}`,
+
   NOTIFICATIONS_UNREAD_COUNT: '/notifications/unread-count',
 };
