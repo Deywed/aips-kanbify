@@ -12,6 +12,9 @@ import type {
   BoardMemberAddedPayload,
   BoardMemberRemovedPayload,
   BoardMemberRoleUpdatedPayload,
+  BoardTagAddedPayload,
+  BoardTagRemovedPayload,
+  BoardTagUpdatedPayload,
 } from '@/types/socket-events.types';
 
 import {
@@ -38,6 +41,9 @@ export const useBoardSocket = (boardId?: string) => {
     addColumn,
     removeColumn,
     updateColumnTitle,
+    addTag,
+    deleteTag,
+    updateTag,
   } = useBoardActions();
 
   useEffect(() => {
@@ -121,6 +127,34 @@ export const useBoardSocket = (boardId?: string) => {
       },
     );
 
+    socket.on(
+      SOCKET_EVENTS.BOARD.TAG_ADDED,
+      (payload: BoardTagAddedPayload) => {
+        if (payload.actorId !== currentUser?.id) {
+          addTag(payload.tag);
+          toast.info(`Tag "${payload.tag.name}" has been added`);
+        }
+      },
+    );
+
+    socket.on(
+      SOCKET_EVENTS.BOARD.TAG_REMOVED,
+      (payload: BoardTagRemovedPayload) => {
+        if (payload.actorId !== currentUser?.id) {
+          deleteTag(payload.tagId);
+        }
+      },
+    );
+
+    socket.on(
+      SOCKET_EVENTS.BOARD.TAG_UPDATED,
+      (payload: BoardTagUpdatedPayload) => {
+        if (payload.actorId !== currentUser?.id) {
+          updateTag(payload.tagId, payload.name);
+        }
+      },
+    );
+
     return () => {
       leaveBoardRoom(boardId);
       const activeSocket = getBoardSocket();
@@ -131,6 +165,9 @@ export const useBoardSocket = (boardId?: string) => {
         activeSocket.off(SOCKET_EVENTS.BOARD.COLUMN_ADDED);
         activeSocket.off(SOCKET_EVENTS.BOARD.COLUMN_REMOVED);
         activeSocket.off(SOCKET_EVENTS.BOARD.COLUMN_UPDATED);
+        activeSocket.off(SOCKET_EVENTS.BOARD.TAG_ADDED);
+        activeSocket.off(SOCKET_EVENTS.BOARD.TAG_REMOVED);
+        activeSocket.off(SOCKET_EVENTS.BOARD.TAG_UPDATED);
         activeSocket.off('connect');
         activeSocket.off('disconnect');
         activeSocket.off('connect_error');
@@ -148,5 +185,8 @@ export const useBoardSocket = (boardId?: string) => {
     addColumn,
     removeColumn,
     updateColumnTitle,
+    addTag,
+    deleteTag,
+    updateTag,
   ]);
 };

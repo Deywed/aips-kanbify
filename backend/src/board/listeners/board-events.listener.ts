@@ -12,6 +12,9 @@ import { BoardMemberEvent } from 'src/board-members/events/board-member.event';
 import { BoardColumnAddedEvent } from 'src/board-column/events/board-column-added.event';
 import { BoardColumnRemovedEvent } from 'src/board-column/events/board-column-removed.event';
 import { BoardColumnUpdatedEvent } from 'src/board-column/events/board-column-updated.event';
+import { BoardTagAddedEvent } from 'src/tag/events/board-tag-added.event';
+import { BoardTagRemovedEvent } from 'src/tag/events/board-tag-removed.event';
+import { BoardTagUpdatedEvent } from 'src/tag/events/board-tag-updated.event';
 
 @Injectable()
 export class BoardEventsListener {
@@ -78,6 +81,33 @@ export class BoardEventsListener {
     this.boardGateway.emitToBoard(
       event.boardId,
       SOCKET_EVENTS.BOARD.COLUMN_UPDATED,
+      event,
+    );
+  }
+
+  @OnEvent(EVENTS.BOARD_TAG_CREATED)
+  handleBoardTagCreated(event: BoardTagAddedEvent) {
+    this.boardGateway.emitToBoard(
+      event.tag.board.id,
+      SOCKET_EVENTS.BOARD.TAG_ADDED,
+      event,
+    );
+  }
+
+  @OnEvent(EVENTS.BOARD_TAG_DELETED)
+  handleBoardTagDeleted(event: BoardTagRemovedEvent) {
+    this.boardGateway.emitToBoard(
+      event.boardId,
+      SOCKET_EVENTS.BOARD.TAG_REMOVED,
+      event,
+    );
+  }
+
+  @OnEvent(EVENTS.BOARD_TAG_UPDATED)
+  handleBoardTagUpdated(event: BoardTagUpdatedEvent) {
+    this.boardGateway.emitToBoard(
+      event.boardId,
+      SOCKET_EVENTS.BOARD.TAG_UPDATED,
       event,
     );
   }
