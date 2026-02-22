@@ -2,203 +2,25 @@ import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 
 import type { BoardMember } from '@/types/auth.types';
-import type {
-  BoardDetails,
-  BoardRole,
-  Card,
-  Column,
-  Tag,
-} from '@/types/board.types';
-
-type BoardState = {
-  // State
-  board: BoardDetails | null;
-  isLoading: boolean;
-
-  // Actions
-  setBoard: (board: BoardDetails) => void;
-  setLoading: (isLoading: boolean) => void;
-
-  // Real time actions for WebSocket updates
-  addMember: (member: BoardMember) => void;
-  removeMember: (userId: string) => void;
-  updateMemberRole: (
-    userId: string,
-    newRole: BoardRole,
-    isMe?: boolean,
-  ) => void;
-  addColumn: (column: Column) => void;
-  removeColumn: (columnId: string) => void;
-  updateColumnTitle: (columnId: string, newTitle: string) => void;
-  addTag: (tag: Tag) => void;
-  deleteTag: (tagId: string) => void;
-  updateTag: (tagId: string, newName: string) => void;
-  addCard: (columnId: string, card: Card) => void;
-  deleteCard: (columnId: string, cardId: string) => void;
-  // TODO: add more actions for columns, cards, etc. as needed
-
-  // Clean up board state when leaving the board page
-  resetBoard: () => void;
-};
+import type { BoardState } from './board';
+import {
+  createBoardCardsSlice,
+  createBoardColumnsSlice,
+  createBoardCoreSlice,
+  createBoardMembersSlice,
+  createBoardTagsSlice,
+} from './board';
 
 const EMPTY_MEMBERS: BoardMember[] = [];
-const EMPTY_COLUMNS: BoardDetails['columns'] = [];
-const EMPTY_TAGS: BoardDetails['tags'] = [];
+const EMPTY_COLUMNS: NonNullable<BoardState['board']>['columns'] = [];
+const EMPTY_TAGS: NonNullable<BoardState['board']>['tags'] = [];
 
-export const useBoardStore = create<BoardState>((set) => ({
-  board: null,
-  isLoading: true,
-
-  setBoard: (board) => set({ board, isLoading: false }),
-
-  setLoading: (isLoading) => set({ isLoading }),
-
-  // Board member actions
-  addMember: (member) =>
-    set((state) => {
-      if (!state.board) return {};
-
-      if (state.board.members.find((m) => m.id === member.id)) return {};
-
-      return {
-        board: {
-          ...state.board,
-          members: [...state.board.members, member],
-        },
-      };
-    }),
-
-  removeMember: (userId) =>
-    set((state) => {
-      if (!state.board) return {};
-      return {
-        board: {
-          ...state.board,
-          members: state.board.members.filter((m) => m.id !== userId),
-        },
-      };
-    }),
-
-  updateMemberRole: (userId: string, newRole: BoardRole, isMe?: boolean) =>
-    set((state) => {
-      if (!state.board) return {};
-      return {
-        board: {
-          ...state.board,
-          role: isMe ? newRole : state.board.role,
-          members: state.board.members.map((m) =>
-            m.id === userId ? { ...m, role: newRole } : m,
-          ),
-        },
-      };
-    }),
-
-  // Column actions
-  addColumn: (column: Column) =>
-    set((state) => {
-      if (!state.board) return {};
-      return {
-        board: {
-          ...state.board,
-          columns: [
-            ...state.board.columns,
-            {
-              ...column,
-              cards: [],
-            },
-          ],
-        },
-      };
-    }),
-
-  removeColumn: (columnId: string) =>
-    set((state) => {
-      if (!state.board) return {};
-      return {
-        board: {
-          ...state.board,
-          columns: state.board.columns.filter((c) => c.id !== columnId),
-        },
-      };
-    }),
-
-  updateColumnTitle: (columnId: string, newTitle: string) =>
-    set((state) => {
-      if (!state.board) return {};
-      return {
-        board: {
-          ...state.board,
-          columns: state.board.columns.map((c) =>
-            c.id === columnId ? { ...c, title: newTitle } : c,
-          ),
-        },
-      };
-    }),
-
-  addTag: (tag: Tag) =>
-    set((state) => {
-      if (!state.board) return {};
-      return {
-        board: {
-          ...state.board,
-          tags: [...state.board.tags, tag],
-        },
-      };
-    }),
-
-  deleteTag: (tagId: string) =>
-    set((state) => {
-      if (!state.board) return {};
-      return {
-        board: {
-          ...state.board,
-          tags: state.board.tags.filter((t) => t.id !== tagId),
-        },
-      };
-    }),
-
-  updateTag: (tagId: string, newName: string) =>
-    set((state) => {
-      if (!state.board) return {};
-      return {
-        board: {
-          ...state.board,
-          tags: state.board.tags.map((t) =>
-            t.id === tagId ? { ...t, name: newName } : t,
-          ),
-        },
-      };
-    }),
-
-  addCard: (columnId: string, card: Card) =>
-    set((state) => {
-      if (!state.board) return {};
-      return {
-        board: {
-          ...state.board,
-          columns: state.board.columns.map((c) =>
-            c.id === columnId ? { ...c, cards: [card, ...c.cards] } : c,
-          ),
-        },
-      };
-    }),
-
-  deleteCard: (columnId: string, cardId: string) =>
-    set((state) => {
-      if (!state.board) return {};
-      return {
-        board: {
-          ...state.board,
-          columns: state.board.columns.map((c) =>
-            c.id === columnId
-              ? { ...c, cards: c.cards.filter((card) => card.id !== cardId) }
-              : c,
-          ),
-        },
-      };
-    }),
-
-  resetBoard: () => set({ board: null, isLoading: false }),
+export const useBoardStore = create<BoardState>((...a) => ({
+  ...createBoardCoreSlice(...a),
+  ...createBoardMembersSlice(...a),
+  ...createBoardColumnsSlice(...a),
+  ...createBoardTagsSlice(...a),
+  ...createBoardCardsSlice(...a),
 }));
 
 // Custom hooks
@@ -226,6 +48,7 @@ export const useUserBoardRole = () =>
 export const useIsBoardLoading = () =>
   useBoardStore((state) => state.isLoading);
 
+// TODO: later should split into separate hooks for each slice (e.g. useBoardMembersActions, useBoardColumnsActions, etc.)
 export const useBoardActions = () =>
   useBoardStore(
     useShallow((state) => ({

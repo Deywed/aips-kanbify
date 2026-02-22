@@ -22,6 +22,6 @@ export class Tag {
   @ManyToOne(() => Board, (board) => board.tags, { onDelete: 'CASCADE' })
   board: Board;
 
-  @ManyToMany(() => Card, (card) => card.tags)
+  @ManyToMany(() => Card, (card) => card.tags, { onDelete: 'CASCADE' })
   cards: Card[];
 }
