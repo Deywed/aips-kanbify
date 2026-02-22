@@ -24,6 +24,7 @@ type UserAvatarProps = {
   size?: number;
   className?: string;
   showTooltip?: boolean;
+  link?: boolean;
 };
 
 const UserAvatar = ({
@@ -31,6 +32,7 @@ const UserAvatar = ({
   size = 9,
   className,
   showTooltip = false,
+  link,
 }: UserAvatarProps) => {
   const avatar = useMemo(
     () => (
@@ -42,7 +44,10 @@ const UserAvatar = ({
         )}
         onClick={(e) => {
           e.stopPropagation();
-          navigateTo(`/users/${user.id}`);
+
+          if (link) {
+            navigateTo(`/users/${user.id}`);
+          }
         }}
       >
         <AvatarImage
@@ -57,7 +62,7 @@ const UserAvatar = ({
         )}
       </Avatar>
     ),
-    [size, className, user],
+    [size, className, user, link],
   );
 
   if (!showTooltip) {

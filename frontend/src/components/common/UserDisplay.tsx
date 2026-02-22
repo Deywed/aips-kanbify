@@ -17,7 +17,7 @@ const UserDisplay = ({ user, link }: UserDisplayProps) => {
   const content = useMemo(
     () => (
       <>
-        <UserAvatar user={user} />
+        <UserAvatar user={user} link />
         <div className="flex flex-col text-sm">
           <span className="underline-offset-4 group-hover:underline">
             {getUserFullName(user)}
