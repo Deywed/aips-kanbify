@@ -9,4 +9,7 @@ export const APP_ROUTES = {
 
   USERS: '/users',
   USER_DETAILS: (userId: string) => `/users/${userId}`,
+
+  CARD_DETAILS: (boardId: string, cardId: string) =>
+    `/boards/${boardId}?card=${cardId}`,
 };

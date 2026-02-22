@@ -44,7 +44,7 @@ export class Notification {
   @ManyToOne(() => User, { nullable: true })
   triggeredBy: User;
 
-  @ManyToOne(() => Card, { nullable: true })
+  @ManyToOne(() => Card, { nullable: true, onDelete: 'CASCADE' })
   card?: Card;
 
   @ManyToOne(() => Board, { nullable: true, onDelete: 'CASCADE' })
