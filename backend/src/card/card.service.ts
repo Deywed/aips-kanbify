@@ -6,17 +6,21 @@ import {
 } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+
+import { EVENTS } from 'src/common/constants/events.constants';
 
 import { BoardColumnService } from 'src/board-column/board-column.service';
 import { BoardMembersService } from 'src/board-members/board-members.service';
 
 import { Board } from 'src/board/entity/board.entity';
 import { BoardColumn } from 'src/board-column/entity/board-column.entity';
-import { CardTag } from 'src/tag/entity/card-tag.entity';
 import { Card } from './entity/card.entity';
 
 import { CreateCardDto } from './dto/create-card.dto';
 import { TagService } from 'src/tag/tag.service';
+import { CardCreatedEvent } from './events/card-created.event';
+import { CardDeletedEvent } from './events/card-deleted.event';
 
 @Injectable()
 export class CardService {
@@ -31,6 +35,7 @@ export class CardService {
     private readonly tagService: TagService,
     private readonly boardMembersService: BoardMembersService,
     private readonly dataSource: DataSource,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async createCard(
@@ -64,11 +69,6 @@ export class CardService {
 
     // 3. Validate and prepare tags
     const tags = await this.tagService.validateAndGetTags(boardId, dto.tagIds);
-    const cardTags = tags.map((tag) => {
-      const cardTag = new CardTag();
-      cardTag.tag = tag;
-      return cardTag;
-    });
 
     // 4. New card goes on first position in column
     const position = await this.boardColumnService.getNextTopPosition(columnId);
@@ -80,7 +80,7 @@ export class CardService {
       column,
       createdBy: { id: userId },
       assignedTo: dto.assignedToId ? { id: dto.assignedToId } : undefined,
-      tags: cardTags,
+      tags,
     });
 
     // 6. Transactional saving
@@ -92,9 +92,23 @@ export class CardService {
       // Save the card (and tags automatically)
       const savedCard = await queryRunner.manager.save(Card, newCard);
 
+      const createdCard = await queryRunner.manager.findOne(Card, {
+        where: { id: savedCard.id },
+        relations: ['column', 'createdBy', 'assignedTo', 'tags'],
+      });
+
+      if (!createdCard) {
+        throw new InternalServerErrorException('Failed to load created card');
+      }
+
       await queryRunner.commitTransaction();
 
-      return savedCard;
+      this.eventEmitter.emit(
+        EVENTS.BOARD_COLUMN_CARD_CREATED,
+        new CardCreatedEvent(boardId, columnId, createdCard, userId),
+      );
+
+      return createdCard;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       console.error('Create Card Error:', error);
@@ -104,7 +118,12 @@ export class CardService {
     }
   }
 
-  async removeCard(boardId: string, columnId: string, cardId: string) {
+  async removeCard(
+    boardId: string,
+    columnId: string,
+    cardId: string,
+    currentUserId: string,
+  ) {
     const card = await this.cardRepo.findOne({
       where: {
         id: cardId,
@@ -118,11 +137,15 @@ export class CardService {
 
     try {
       await this.cardRepo.remove(card);
+      this.eventEmitter.emit(
+        EVENTS.BOARD_COLUMN_CARD_DELETED,
+        new CardDeletedEvent(boardId, columnId, cardId, currentUserId),
+      );
     } catch (error) {
       console.error('Remove Card Error:', error);
       throw new InternalServerErrorException('Failed to remove card');
     }
 
-    return { id: cardId, message: 'Card removed successfully' };
+    return { id: cardId };
   }
 }

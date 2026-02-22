@@ -4,6 +4,8 @@ import { Add01Icon } from '@hugeicons/core-free-icons';
 
 import { useBoardColumns, useIsBoardLoading } from '@/stores/board.store';
 
+import { BoardAdminGuard } from '@/components/guards/BoardAdminGuard';
+
 import H4 from '@/components/ui/typography/H4';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -13,8 +15,7 @@ import BlockUI from '@/components/common/BlockUI';
 
 import BoardColumnDialog from './BoardColumnDialog';
 import BoardColumnDropdown from './BoardColumnDropdown';
-import ColumnCards from '../ColumnCards';
-import { BoardAdminGuard } from '@/components/guards/BoardAdminGuard';
+import ColumnCards from '../cards/ColumnCards';
 
 type BoardColumnsProps = {
   isError?: boolean;
@@ -51,7 +52,7 @@ const BoardColumns = ({ isError }: BoardColumnsProps) => {
                 <div className="flex items-center justify-between gap-2 p-2">
                   <div className="flex items-center gap-2">
                     <H4>{column.title}</H4>
-                    <Badge>{column.cards.length}</Badge>
+                    <Badge variant="secondary">{column.cards.length}</Badge>
                   </div>
                   <BoardAdminGuard>
                     <BoardColumnDropdown column={column} />

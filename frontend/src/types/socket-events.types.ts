@@ -1,5 +1,5 @@
 import type { BoardMember } from './auth.types';
-import type { BoardRole, Column, Tag } from './board.types';
+import type { BoardRole, Card, Column, Tag } from './board.types';
 
 // Board members
 export type BoardMemberAddedPayload = {
@@ -53,5 +53,20 @@ export type BoardTagUpdatedPayload = {
   boardId: string;
   tagId: string;
   name: string;
+  actorId: string;
+};
+
+// Cards
+export type CardAddedPayload = {
+  boardId: string;
+  columnId: string;
+  card: Card;
+  actorId: string;
+};
+
+export type CardDeletedPayload = {
+  boardId: string;
+  columnId: string;
+  cardId: string;
   actorId: string;
 };

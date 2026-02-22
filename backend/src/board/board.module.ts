@@ -12,6 +12,7 @@ import { BoardMembersModule } from 'src/board-members/board-members.module';
 import { BoardColumnListener } from './listeners/board-column.listener';
 import { BoardTagListener } from './listeners/board-tag.listener';
 import { BoardMemberListener } from './listeners/board-member.listener';
+import { BoardColumnCardListener } from './listeners/board-column-card.listener';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Board, BoardMember]), BoardMembersModule],
@@ -21,6 +22,7 @@ import { BoardMemberListener } from './listeners/board-member.listener';
     BoardColumnListener,
     BoardTagListener,
     BoardMemberListener,
+    BoardColumnCardListener,
   ],
   controllers: [BoardController],
 })

@@ -26,5 +26,10 @@ export const API_ENDPOINTS = {
   UPDATE_TAG: (boardId: string, tagId: string) =>
     `/board/${boardId}/tags/${tagId}`,
 
+  CREATE_CARD: (boardId: string, columnId: string) =>
+    `/board/${boardId}/columns/${columnId}/cards`,
+  DELETE_CARD: (boardId: string, columnId: string, cardId: string) =>
+    `/board/${boardId}/columns/${columnId}/cards/${cardId}`,
+
   NOTIFICATIONS_UNREAD_COUNT: '/notifications/unread-count',
 };

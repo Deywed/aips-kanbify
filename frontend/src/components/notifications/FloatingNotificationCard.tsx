@@ -1,13 +1,19 @@
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Cancel01Icon } from '@hugeicons/core-free-icons';
 
-import { roleToLabel } from '@/lib/utils';
+import { getUserFullName, roleToLabel } from '@/lib/utils';
+import { navigateTo } from '@/lib/navigation';
 
+import { APP_ROUTES } from '@/config/appRoutes';
+
+import type { BoardBase } from '@/types/board.types';
+import type { User } from '@/types/auth.types';
 import type { Notification } from '@/types/notification.types';
 
 import { Button } from '@/components/ui/button';
 
 import BoardMemberNotification from './BoardMemberNotification';
+import CardAssignedNotification from './CardAssignedNotification';
 
 type FloatingNotificationCardProps = {
   notification: Notification;
@@ -63,9 +69,29 @@ const NotificationBaseBody = ({ notification }: NotificationBaseBodyProps) => {
           roleText={`to ${roleToLabel(notification.payload?.role)}`}
         />
       );
+    case 'CARD_ASSIGNED':
+      return <CardAssignedNotification notification={notification} />;
     default:
       return null;
   }
 };
+
+export const UserFullNameLink = ({ user }: { user: User }) => (
+  <span
+    className="hover:text-primary cursor-pointer font-bold underline-offset-4 hover:underline"
+    onClick={() => navigateTo(APP_ROUTES.USER_DETAILS(user.id))}
+  >
+    {getUserFullName(user)}
+  </span>
+);
+
+export const BoardTitleLink = ({ board }: { board?: BoardBase }) => (
+  <span
+    className="hover:text-primary cursor-pointer font-bold underline-offset-4 hover:underline"
+    onClick={() => navigateTo(APP_ROUTES.BOARD_DETAILS(board?.id ?? ''))}
+  >
+    {board?.title}
+  </span>
+);
 
 export default FloatingNotificationCard;

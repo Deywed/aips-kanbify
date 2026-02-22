@@ -1,14 +1,14 @@
 import {
   Column,
   Entity,
+  ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
 
-import { CardTag } from './card-tag.entity';
 import { Board } from 'src/board/entity/board.entity';
+import { Card } from 'src/card/entity/card.entity';
 
 @Entity('tags')
 @Unique(['board', 'name'])
@@ -22,6 +22,6 @@ export class Tag {
   @ManyToOne(() => Board, (board) => board.tags, { onDelete: 'CASCADE' })
   board: Board;
 
-  @OneToMany(() => CardTag, (ct) => ct.tag)
-  cards: CardTag[];
+  @ManyToMany(() => Card, (card) => card.tags, { onDelete: 'CASCADE' })
+  cards: Card[];
 }

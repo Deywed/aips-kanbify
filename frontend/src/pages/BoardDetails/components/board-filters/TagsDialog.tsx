@@ -84,8 +84,8 @@ const TagsDialog = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="-mx-4 max-h-[70vh]">
-          <div className="mx-4 flex flex-col gap-6">
+        <ScrollArea className="-mx-6 max-h-[70vh]">
+          <div className="mx-6 flex flex-col gap-6">
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <FieldGroup className="gap-4">
                 <FormInput

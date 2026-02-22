@@ -17,5 +17,8 @@ export const SOCKET_EVENTS = {
     TAG_ADDED: 'board:tagAdded',
     TAG_REMOVED: 'board:tagRemoved',
     TAG_UPDATED: 'board:tagUpdated',
+
+    COLUMN_CARD_CREATED: 'board:columnCardCreated',
+    COLUMN_CARD_DELETED: 'board:columnCardDeleted',
   },
 } as const;

@@ -13,6 +13,7 @@ import { useAccessToken } from '@/stores/auth.store';
 import useBoardColumnEvent from './useBoardColumnEvent';
 import useBoardMemberEvent from './useBoardMemberEvent';
 import useBoardTagEvent from './useBoardTagEvent';
+import useBoardColumnCardEvent from './useBoardColumnCardEvent';
 
 export const useBoardSocket = (boardId?: string) => {
   const token = useAccessToken();
@@ -22,6 +23,7 @@ export const useBoardSocket = (boardId?: string) => {
   useBoardMemberEvent(socket);
   useBoardColumnEvent(socket);
   useBoardTagEvent(socket);
+  useBoardColumnCardEvent(socket);
 
   useEffect(() => {
     if (!token || !boardId) return;
