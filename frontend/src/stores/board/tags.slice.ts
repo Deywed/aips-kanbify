@@ -22,6 +22,13 @@ export const createBoardTagsSlice: StateCreator<
       withBoardUpdate((board) => ({
         ...board,
         tags: board.tags.filter((tag) => tag.id !== tagId),
+        columns: board.columns.map((column) => ({
+          ...column,
+          cards: column.cards.map((card) => ({
+            ...card,
+            tags: card.tags.filter((tag) => tag.id !== tagId),
+          })),
+        })),
       })),
     ),
 
@@ -32,6 +39,15 @@ export const createBoardTagsSlice: StateCreator<
         tags: board.tags.map((tag) =>
           tag.id === tagId ? { ...tag, name: newName } : tag,
         ),
+        columns: board.columns.map((column) => ({
+          ...column,
+          cards: column.cards.map((card) => ({
+            ...card,
+            tags: card.tags.map((tag) =>
+              tag.id === tagId ? { ...tag, name: newName } : tag,
+            ),
+          })),
+        })),
       })),
     ),
 });
