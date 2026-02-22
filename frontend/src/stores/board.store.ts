@@ -2,7 +2,13 @@ import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 
 import type { BoardMember } from '@/types/auth.types';
-import type { BoardDetails, BoardRole, Column, Tag } from '@/types/board.types';
+import type {
+  BoardDetails,
+  BoardRole,
+  Card,
+  Column,
+  Tag,
+} from '@/types/board.types';
 
 type BoardState = {
   // State
@@ -27,6 +33,7 @@ type BoardState = {
   addTag: (tag: Tag) => void;
   deleteTag: (tagId: string) => void;
   updateTag: (tagId: string, newName: string) => void;
+  addCard: (columnId: string, card: Card) => void;
   // TODO: add more actions for columns, cards, etc. as needed
 
   // Clean up board state when leaving the board page
@@ -162,6 +169,19 @@ export const useBoardStore = create<BoardState>((set) => ({
       };
     }),
 
+  addCard: (columnId: string, card: Card) =>
+    set((state) => {
+      if (!state.board) return {};
+      return {
+        board: {
+          ...state.board,
+          columns: state.board.columns.map((c) =>
+            c.id === columnId ? { ...c, cards: [card, ...c.cards] } : c,
+          ),
+        },
+      };
+    }),
+
   resetBoard: () => set({ board: null, isLoading: false }),
 }));
 
@@ -204,6 +224,7 @@ export const useBoardActions = () =>
       addTag: state.addTag,
       deleteTag: state.deleteTag,
       updateTag: state.updateTag,
+      addCard: state.addCard,
       resetBoard: state.resetBoard,
     })),
   );

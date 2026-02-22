@@ -21,7 +21,7 @@ type BoardCardProps = {
 
 const BoardCard = ({ board }: BoardCardProps) => {
   return (
-    <Card className="hover:bg-muted/40 gap-4 transition-colors">
+    <Card className="hover:bg-muted/40 hover:border-primary gap-4 border border-transparent transition-colors">
       <CardHeader>
         <CardTitle className="flex">
           <Link
