@@ -34,10 +34,12 @@ export class CardController {
 
   @Delete(':cardId')
   removeCard(
+    @Req() req: Request,
     @Param('boardId', ParseUUIDPipe) boardId: string,
     @Param('columnId', ParseUUIDPipe) columnId: string,
     @Param('cardId', ParseUUIDPipe) cardId: string,
   ) {
-    return this.cardService.removeCard(boardId, columnId, cardId);
+    const user = req['user'] as JwtPayload;
+    return this.cardService.removeCard(boardId, columnId, cardId, user.sub);
   }
 }

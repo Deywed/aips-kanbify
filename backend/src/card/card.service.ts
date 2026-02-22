@@ -6,6 +6,9 @@ import {
 } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+
+import { EVENTS } from 'src/common/constants/events.constants';
 
 import { BoardColumnService } from 'src/board-column/board-column.service';
 import { BoardMembersService } from 'src/board-members/board-members.service';
@@ -16,6 +19,8 @@ import { Card } from './entity/card.entity';
 
 import { CreateCardDto } from './dto/create-card.dto';
 import { TagService } from 'src/tag/tag.service';
+import { CardCreatedEvent } from './events/card-created.event';
+import { CardDeletedEvent } from './events/card-deleted.event';
 
 @Injectable()
 export class CardService {
@@ -30,6 +35,7 @@ export class CardService {
     private readonly tagService: TagService,
     private readonly boardMembersService: BoardMembersService,
     private readonly dataSource: DataSource,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async createCard(
@@ -97,6 +103,11 @@ export class CardService {
 
       await queryRunner.commitTransaction();
 
+      this.eventEmitter.emit(
+        EVENTS.BOARD_COLUMN_CARD_CREATED,
+        new CardCreatedEvent(boardId, columnId, createdCard, userId),
+      );
+
       return createdCard;
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -107,7 +118,12 @@ export class CardService {
     }
   }
 
-  async removeCard(boardId: string, columnId: string, cardId: string) {
+  async removeCard(
+    boardId: string,
+    columnId: string,
+    cardId: string,
+    currentUserId: string,
+  ) {
     const card = await this.cardRepo.findOne({
       where: {
         id: cardId,
@@ -121,6 +137,10 @@ export class CardService {
 
     try {
       await this.cardRepo.remove(card);
+      this.eventEmitter.emit(
+        EVENTS.BOARD_COLUMN_CARD_DELETED,
+        new CardDeletedEvent(boardId, columnId, cardId, currentUserId),
+      );
     } catch (error) {
       console.error('Remove Card Error:', error);
       throw new InternalServerErrorException('Failed to remove card');

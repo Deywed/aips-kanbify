@@ -20,9 +20,14 @@ import DeleteConfirmDialog from '@/components/common/DeleteConfirmDialog';
 type ColumnCardDropdownProps = {
   columnId: string;
   card: Card;
+  className?: string;
 };
 
-const ColumnCardDropdown = ({ columnId, card }: ColumnCardDropdownProps) => {
+const ColumnCardDropdown = ({
+  columnId,
+  card,
+  className,
+}: ColumnCardDropdownProps) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const { mutate, isPending } = useDeleteCardMutation(columnId, card.id);
@@ -40,6 +45,7 @@ const ColumnCardDropdown = ({ columnId, card }: ColumnCardDropdownProps) => {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger
+          className={className}
           render={
             <Button size="icon-sm" variant="outline">
               <HugeiconsIcon icon={MoreHorizontalIcon} />

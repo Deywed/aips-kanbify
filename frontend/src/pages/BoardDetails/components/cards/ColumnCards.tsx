@@ -28,11 +28,15 @@ const ColumnCards = ({ columnId, cards }: ColumnCardsProps) => {
         {cards.map((card) => (
           <div
             key={card.id}
-            className="bg-muted flex flex-col gap-1 rounded-md border p-2"
+            className="bg-muted group hover:bg-muted/80 flex flex-col gap-1 rounded-md border p-2"
           >
             <div className="flex justify-between gap-2">
               <span>{card.title}</span>
-              <ColumnCardDropdown columnId={columnId} card={card} />
+              <ColumnCardDropdown
+                columnId={columnId}
+                card={card}
+                className="invisible group-hover:visible"
+              />
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
