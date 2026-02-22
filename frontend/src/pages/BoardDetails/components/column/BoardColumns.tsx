@@ -52,7 +52,7 @@ const BoardColumns = ({ isError }: BoardColumnsProps) => {
                 <div className="flex items-center justify-between gap-2 p-2">
                   <div className="flex items-center gap-2">
                     <H4>{column.title}</H4>
-                    <Badge>{column.cards.length}</Badge>
+                    <Badge variant="secondary">{column.cards.length}</Badge>
                   </div>
                   <BoardAdminGuard>
                     <BoardColumnDropdown column={column} />

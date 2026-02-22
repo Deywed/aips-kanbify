@@ -2,6 +2,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -10,8 +12,8 @@ import {
 
 import { BoardColumn } from 'src/board-column/entity/board-column.entity';
 import { User } from 'src/users/entity/user.entity';
-import { CardTag } from 'src/tag/entity/card-tag.entity';
 import { CardHistory } from 'src/card-history/entity/card-history.entity';
+import { Tag } from 'src/tag/entity/tag.entity';
 
 @Entity('cards')
 export class Card {
@@ -45,8 +47,13 @@ export class Card {
   @ManyToOne(() => User, { nullable: true })
   assignedTo?: User;
 
-  @OneToMany(() => CardTag, (ct) => ct.card, { cascade: ['insert'] })
-  tags: CardTag[];
+  @ManyToMany(() => Tag, (tag) => tag.cards)
+  @JoinTable({
+    name: 'card_tags',
+    joinColumn: { name: 'cardId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'tagId', referencedColumnName: 'id' },
+  })
+  tags: Tag[];
 
   @OneToMany(() => CardHistory, (h) => h.card)
   history: CardHistory[];

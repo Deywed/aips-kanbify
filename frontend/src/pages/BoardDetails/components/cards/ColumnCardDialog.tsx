@@ -86,7 +86,7 @@ const ColumnCardDialog = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={open}>
+    <Dialog open={isOpen} onOpenChange={open} disablePointerDismissal>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>

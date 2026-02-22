@@ -10,13 +10,12 @@ import { BoardMembersModule } from 'src/board-members/board-members.module';
 import { Board } from 'src/board/entity/board.entity';
 import { BoardMember } from 'src/board-members/entity/board-members.entity';
 import { BoardColumn } from 'src/board-column/entity/board-column.entity';
-import { CardTag } from 'src/tag/entity/card-tag.entity';
 import { Card } from './entity/card.entity';
 import { TagModule } from 'src/tag/tag.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Card, Board, BoardColumn, BoardMember, CardTag]),
+    TypeOrmModule.forFeature([Card, Board, BoardColumn, BoardMember]),
     BoardColumnModule,
     BoardMembersModule,
     TagModule,

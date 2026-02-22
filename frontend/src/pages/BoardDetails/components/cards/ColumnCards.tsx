@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import UserAvatar from '@/components/common/UserAvatar';
 
 import ColumnCardDialog from './ColumnCardDialog';
+import ColumnCardDropdown from './ColumnCardDropdown';
+import { Badge } from '@/components/ui/badge';
 
 type ColumnCardsProps = {
   columnId: string;
@@ -26,9 +28,18 @@ const ColumnCards = ({ columnId, cards }: ColumnCardsProps) => {
         {cards.map((card) => (
           <div
             key={card.id}
-            className="bg-muted flex flex-col gap-2 rounded-md border p-2"
+            className="bg-muted flex flex-col gap-1 rounded-md border p-2"
           >
-            <span>{card.title}</span>
+            <div className="flex justify-between gap-2">
+              <span>{card.title}</span>
+              <ColumnCardDropdown columnId={columnId} card={card} />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              {card.tags.map((tag) => (
+                <Badge key={tag.id}>{tag.name}</Badge>
+              ))}
+            </div>
 
             <div className="flex items-end justify-between gap-2">
               {card.dueDate && (
