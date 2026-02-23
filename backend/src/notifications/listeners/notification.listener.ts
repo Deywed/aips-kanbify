@@ -11,82 +11,51 @@ import { SOCKET_EVENTS } from 'src/common/constants/socket-events.constants';
 
 import { BoardMemberEvent } from 'src/board-members/events/board-member.event';
 import { CardCreatedEvent } from 'src/card/events/card-created.event';
+import { CardUpdatedEvent } from 'src/card/events/card-updated.event';
 
 import {
   Notification,
   NotificationType,
 } from 'src/notifications/entity/notifications.entity';
 
+type CreateNotificationPayload = Parameters<
+  Repository<Notification>['create']
+>[0];
+
 @Injectable()
 export class NotificationListener {
+  private readonly logger = new Logger(NotificationListener.name);
+
   constructor(
     @InjectRepository(Notification)
     private notificationRepo: Repository<Notification>,
     private notificationsGateway: NotificationsGateway,
   ) {}
 
-  private readonly logger = new Logger(NotificationListener.name);
+  // ─── Board Member Events ────────────────────────────────────────────────────
 
-  // Board members events
   @OnEvent(EVENTS.BOARD_MEMBER_ADDED)
-  async handleBoardMemberAddedEvent(event: BoardMemberEvent) {
-    await this.handleBoardMemberEvent(
+  handleBoardMemberAddedEvent(event: BoardMemberEvent) {
+    return this.handleBoardMemberEvent(
       event,
       NotificationType.BOARD_MEMBER_ADDED,
     );
   }
 
   @OnEvent(EVENTS.BOARD_MEMBER_REMOVED)
-  async handleBoardMemberRemovedEvent(event: BoardMemberEvent) {
-    await this.handleBoardMemberEvent(
+  handleBoardMemberRemovedEvent(event: BoardMemberEvent) {
+    return this.handleBoardMemberEvent(
       event,
       NotificationType.BOARD_MEMBER_REMOVED,
     );
   }
 
   @OnEvent(EVENTS.BOARD_MEMBER_ROLE_UPDATED)
-  async handleBoardMemberRoleUpdatedEvent(event: BoardMemberEvent) {
-    await this.handleBoardMemberEvent(
+  handleBoardMemberRoleUpdatedEvent(event: BoardMemberEvent) {
+    return this.handleBoardMemberEvent(
       event,
       NotificationType.BOARD_MEMBER_ROLE_UPDATED,
     );
-  }
-
-  // Card events
-  @OnEvent(EVENTS.BOARD_COLUMN_CARD_CREATED)
-  async handleCardCreatedEvent(event: CardCreatedEvent) {
-    const { boardId, card, actorId } = event;
-
-    if (!card.assignedTo) {
-      return;
-    }
-
-    const notification = this.notificationRepo.create({
-      user: { id: card.assignedTo.id },
-      triggeredBy: { id: actorId },
-      board: { id: boardId },
-      card: { id: card.id },
-      type: NotificationType.CARD_ASSIGNED,
-    });
-
-    try {
-      await this.notificationRepo.save(notification);
-
-      const fullNotification = await this.notificationRepo.findOne({
-        where: { id: notification.id },
-        relations: ['triggeredBy', 'board', 'card'],
-      });
-
-      this.notificationsGateway.sendToUser(
-        card.assignedTo.id,
-        SOCKET_EVENTS.NOTIFICATIONS.NEW,
-        plainToInstance(Notification, fullNotification),
-      );
-    } catch (error) {
-      this.logger.error(
-        `Failed to create notification for user ${card.assignedTo.id} about card assignment on board ${boardId}: ${error.message}`,
-      );
-    }
   }
 
   private async handleBoardMemberEvent(
@@ -95,30 +64,88 @@ export class NotificationListener {
   ) {
     const { boardId, targetMember, changedByUserId, role } = event;
 
-    const notification = this.notificationRepo.create({
-      user: { id: targetMember.user.id },
-      triggeredBy: { id: changedByUserId },
-      board: { id: boardId },
-      payload: role ? { role } : null,
-      type,
-    });
+    await this.createAndSendNotification(
+      targetMember.user.id,
+      {
+        user: { id: targetMember.user.id },
+        triggeredBy: { id: changedByUserId },
+        board: { id: boardId },
+        payload: role ? { role } : null,
+        type,
+      },
+      ['triggeredBy', 'board'],
+    );
+  }
+
+  // ─── Card Events ────────────────────────────────────────────────────────────
+
+  @OnEvent(EVENTS.BOARD_COLUMN_CARD_CREATED)
+  async handleCardCreatedEvent({ boardId, card, actorId }: CardCreatedEvent) {
+    if (!card.assignedTo) return;
+
+    await this.createAndSendNotification(
+      card.assignedTo.id,
+      {
+        user: { id: card.assignedTo.id },
+        triggeredBy: { id: actorId },
+        board: { id: boardId },
+        card: { id: card.id },
+        type: NotificationType.CARD_ASSIGNED,
+      },
+      ['triggeredBy', 'board', 'card'],
+    );
+  }
+
+  @OnEvent(EVENTS.BOARD_COLUMN_CARD_UPDATED)
+  async handleCardUpdatedEvent({
+    boardId,
+    card,
+    actorId,
+    oldCard,
+  }: CardUpdatedEvent) {
+    const oldAssignedToId = oldCard?.assignedTo?.id ?? null;
+    const newAssignedToId = card.assignedTo?.id ?? null;
+
+    if (!newAssignedToId || oldAssignedToId === newAssignedToId) return;
+
+    await this.createAndSendNotification(
+      newAssignedToId,
+      {
+        user: { id: newAssignedToId },
+        triggeredBy: { id: actorId },
+        board: { id: boardId },
+        card: { id: card.id },
+        type: NotificationType.CARD_ASSIGNED,
+      },
+      ['triggeredBy', 'board', 'card'],
+    );
+  }
+
+  // ─── Shared Helper ──────────────────────────────────────────────────────────
+
+  private async createAndSendNotification(
+    recipientId: string,
+    payload: CreateNotificationPayload,
+    relations: string[],
+  ) {
+    const notification = this.notificationRepo.create(payload);
 
     try {
       await this.notificationRepo.save(notification);
 
       const fullNotification = await this.notificationRepo.findOne({
         where: { id: notification.id },
-        relations: ['triggeredBy', 'board'],
+        relations,
       });
 
       this.notificationsGateway.sendToUser(
-        targetMember.user.id,
+        recipientId,
         SOCKET_EVENTS.NOTIFICATIONS.NEW,
         plainToInstance(Notification, fullNotification),
       );
     } catch (error) {
       this.logger.error(
-        `Failed to create notification for user ${targetMember.user.id} about board ${boardId}: ${error.message}`,
+        `Failed to create notification for user ${recipientId}: ${error.message}`,
       );
     }
   }

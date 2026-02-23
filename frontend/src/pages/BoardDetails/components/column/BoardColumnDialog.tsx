@@ -41,6 +41,7 @@ const BoardColumnDialog = ({
     defaultValues: {
       title: initialColumn?.title || '',
     },
+    resetOptions: { keepDirty: false },
   });
 
   const {
@@ -68,7 +69,6 @@ const BoardColumnDialog = ({
 
       updateMutation.mutate(dirtyValues, {
         onSuccess: () => {
-          form.reset();
           toast.success('Column updated successfully!');
           open(false);
         },
@@ -76,7 +76,6 @@ const BoardColumnDialog = ({
     } else {
       createMutation.mutate(data, {
         onSuccess: () => {
-          form.reset();
           toast.success('Column created successfully!');
           open(false);
         },

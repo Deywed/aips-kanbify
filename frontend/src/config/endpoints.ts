@@ -28,6 +28,8 @@ export const API_ENDPOINTS = {
 
   CREATE_CARD: (boardId: string, columnId: string) =>
     `/board/${boardId}/columns/${columnId}/cards`,
+  UPDATE_CARD: (boardId: string, columnId: string, cardId: string) =>
+    `/board/${boardId}/columns/${columnId}/cards/${cardId}`,
   DELETE_CARD: (boardId: string, columnId: string, cardId: string) =>
     `/board/${boardId}/columns/${columnId}/cards/${cardId}`,
 

@@ -19,6 +19,7 @@ export const SOCKET_EVENTS = {
     TAG_UPDATED: 'board:tagUpdated',
 
     COLUMN_CARD_CREATED: 'board:columnCardCreated',
+    COLUMN_CARD_UPDATED: 'board:columnCardUpdated',
     COLUMN_CARD_DELETED: 'board:columnCardDeleted',
   },
 } as const;

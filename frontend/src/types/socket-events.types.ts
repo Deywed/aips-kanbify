@@ -64,6 +64,14 @@ export type CardAddedPayload = {
   actorId: string;
 };
 
+export type CardUpdatedPayload = {
+  boardId: string;
+  columnId: string;
+  card: Card;
+  actorId: string;
+  oldCard?: Card;
+};
+
 export type CardDeletedPayload = {
   boardId: string;
   columnId: string;

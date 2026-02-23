@@ -45,7 +45,7 @@ export class Card {
   createdBy: User;
 
   @ManyToOne(() => User, { nullable: true })
-  assignedTo?: User;
+  assignedTo?: User | null;
 
   @ManyToMany(() => Tag, (tag) => tag.cards)
   @JoinTable({

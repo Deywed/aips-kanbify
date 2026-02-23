@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Delete02Icon, MoreHorizontalIcon } from '@hugeicons/core-free-icons';
+import {
+  Delete02Icon,
+  MoreHorizontalIcon,
+  PencilEdit01Icon,
+} from '@hugeicons/core-free-icons';
 import { toast } from 'sonner';
 
 import type { Card } from '@/types/board.types';
@@ -16,6 +20,7 @@ import {
 import { Button } from '@/components/ui/button';
 
 import DeleteConfirmDialog from '@/components/common/DeleteConfirmDialog';
+import ColumnCardDialog from './ColumnCardDialog';
 
 type ColumnCardDropdownProps = {
   columnId: string;
@@ -29,6 +34,7 @@ const ColumnCardDropdown = ({
   className,
 }: ColumnCardDropdownProps) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const { mutate, isPending } = useDeleteCardMutation(columnId, card.id);
 
@@ -53,6 +59,10 @@ const ColumnCardDropdown = ({
           }
         />
         <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
+            <HugeiconsIcon icon={PencilEdit01Icon} />
+            Edit
+          </DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"
             onClick={() => setIsDeleteDialogOpen(true)}
@@ -70,6 +80,13 @@ const ColumnCardDropdown = ({
         description="This action cannot be undone."
         onConfirm={handleDeleteCard}
         isLoading={isPending}
+      />
+
+      <ColumnCardDialog
+        isOpen={isEditDialogOpen}
+        open={setIsEditDialogOpen}
+        columnId={columnId}
+        initialCard={card}
       />
     </>
   );

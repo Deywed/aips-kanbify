@@ -53,15 +53,19 @@ export const roleToLabel = (role?: BoardRole) => {
 export function getDirtyValues<T extends Record<string, unknown>>(
   dirtyFields: Partial<Record<keyof T, unknown>>,
   allValues: T,
-): Partial<T> {
+): Partial<Record<keyof T, T[keyof T] | null>> {
   if (!dirtyFields || Object.keys(dirtyFields).length === 0) {
     return {};
   }
 
-  return Object.keys(dirtyFields).reduce((acc, key) => {
-    if (dirtyFields[key as keyof T]) {
-      acc[key as keyof T] = allValues[key as keyof T];
-    }
-    return acc;
-  }, {} as Partial<T>);
+  return Object.keys(dirtyFields).reduce(
+    (acc, key) => {
+      if (dirtyFields[key as keyof T]) {
+        const value = allValues[key as keyof T];
+        acc[key as keyof T] = value !== undefined ? value : null;
+      }
+      return acc;
+    },
+    {} as Partial<Record<keyof T, T[keyof T] | null>>,
+  );
 }

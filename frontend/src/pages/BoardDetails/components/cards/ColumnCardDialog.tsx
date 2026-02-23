@@ -1,13 +1,14 @@
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { getUserFullName } from '@/lib/utils';
+import { getDirtyValues, getUserFullName } from '@/lib/utils';
 import { toast } from 'sonner';
 
 import type { Card } from '@/types/board.types';
 import { cardSchema, type CardSchemaType } from './newCard.schema';
 
 import { useCreateCardMutation } from '@/mutations/cards/useCreateCardMutation';
+import { useUpdateCardMutation } from '@/mutations/cards/useUpdateCardMutation';
 
 import { useBoardMembers, useBoardTags } from '@/stores/board.store';
 
@@ -70,20 +71,51 @@ const ColumnCardDialog = ({
     },
   });
 
-  const createMutation = useCreateCardMutation(columnId);
+  const {
+    formState: { dirtyFields },
+  } = form;
 
-  const isPending = createMutation.isPending;
+  const createMutation = useCreateCardMutation(columnId);
+  const updateMutation = useUpdateCardMutation(columnId, initialCard?.id || '');
+
+  const isPending = createMutation.isPending || updateMutation.isPending;
 
   const onSubmit = async (data: CardSchemaType) => {
-    createMutation.mutate(data, {
-      onSuccess: () => {
-        form.reset();
-        open(false);
+    if (initialCard) {
+      const dirtyValues = getDirtyValues(dirtyFields, data);
 
-        toast.success('Card created successfully');
-      },
-    });
+      if (Object.keys(dirtyValues).length === 0) {
+        open(false);
+        return;
+      }
+
+      updateMutation.mutate(dirtyValues, {
+        onSuccess: () => {
+          open(false);
+          toast.success('Card updated successfully');
+        },
+      });
+    } else {
+      createMutation.mutate(data, {
+        onSuccess: () => {
+          open(false);
+          toast.success('Card created successfully');
+        },
+      });
+    }
   };
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    form.reset({
+      title: initialCard?.title || '',
+      description: initialCard?.description || '',
+      dueDate: initialCard?.dueDate ? new Date(initialCard.dueDate) : undefined,
+      assignedToId: initialCard?.assignedTo?.id || undefined,
+      tagIds: initialCard?.tags.map((tag) => tag.id) || [],
+    });
+  }, [isOpen, initialCard, form]);
 
   return (
     <Dialog open={isOpen} onOpenChange={open} disablePointerDismissal>
@@ -176,7 +208,7 @@ const ColumnCardDialog = ({
                 />
                 <Button type="submit" disabled={isPending}>
                   <LoadingSwap isLoading={isPending}>
-                    {initialCard ? 'Save' : 'Create Card'}
+                    {initialCard ? 'Save' : 'Create'}
                   </LoadingSwap>
                 </Button>
               </DialogFooter>

@@ -8,3 +8,10 @@ export const newColumnSchema = z.object({
 });
 
 export type NewColumnSchemaType = z.infer<typeof newColumnSchema>;
+
+export type UpdateColumnPayload = Partial<
+  Record<
+    keyof NewColumnSchemaType,
+    NewColumnSchemaType[keyof NewColumnSchemaType] | null
+  >
+>;

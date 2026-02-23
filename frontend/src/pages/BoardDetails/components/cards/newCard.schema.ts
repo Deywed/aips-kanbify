@@ -12,3 +12,7 @@ export const cardSchema = z.object({
 });
 
 export type CardSchemaType = z.infer<typeof cardSchema>;
+
+export type CardUpdatePayload = Partial<
+  Record<keyof CardSchemaType, CardSchemaType[keyof CardSchemaType] | null>
+>;

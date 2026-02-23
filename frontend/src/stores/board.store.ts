@@ -64,6 +64,7 @@ export const useBoardActions = () =>
       deleteTag: state.deleteTag,
       updateTag: state.updateTag,
       addCard: state.addCard,
+      updateCard: state.updateCard,
       deleteCard: state.deleteCard,
       resetBoard: state.resetBoard,
     })),

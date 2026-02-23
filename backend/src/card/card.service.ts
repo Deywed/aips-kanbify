@@ -18,9 +18,13 @@ import { BoardColumn } from 'src/board-column/entity/board-column.entity';
 import { Card } from './entity/card.entity';
 
 import { CreateCardDto } from './dto/create-card.dto';
-import { TagService } from 'src/tag/tag.service';
+import { UpdateCardDto } from './dto/update-card.dto';
+
 import { CardCreatedEvent } from './events/card-created.event';
 import { CardDeletedEvent } from './events/card-deleted.event';
+import { CardUpdatedEvent } from './events/card-updated.event';
+
+import { TagService } from 'src/tag/tag.service';
 
 @Injectable()
 export class CardService {
@@ -113,6 +117,104 @@ export class CardService {
       await queryRunner.rollbackTransaction();
       console.error('Create Card Error:', error);
       throw new InternalServerErrorException('Failed to create card');
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async updateCard(
+    boardId: string,
+    columnId: string,
+    cardId: string,
+    dto: UpdateCardDto,
+    currentUserId: string,
+  ) {
+    const card = await this.cardRepo.findOne({
+      where: {
+        id: cardId,
+        column: { id: columnId, board: { id: boardId } },
+      },
+      relations: ['column', 'createdBy', 'assignedTo', 'tags'],
+    });
+
+    if (!card) {
+      throw new NotFoundException('Card not found on this column and board');
+    }
+
+    const oldCard = {
+      ...card,
+      column: card.column ? { ...card.column } : card.column,
+      createdBy: card.createdBy ? { ...card.createdBy } : card.createdBy,
+      assignedTo: card.assignedTo ? { ...card.assignedTo } : undefined,
+      tags: card.tags ? [...card.tags] : [],
+    } as Card;
+
+    if (dto.assignedToId) {
+      const isMember = await this.boardMembersService.isUserMemberOfBoard(
+        boardId,
+        dto.assignedToId,
+      );
+
+      if (!isMember) {
+        throw new BadRequestException(
+          'Assigned user is not a member of the board',
+        );
+      }
+    }
+
+    const tags =
+      dto.tagIds !== undefined
+        ? await this.tagService.validateAndGetTags(boardId, dto.tagIds)
+        : undefined;
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const { title, description, dueDate } = dto;
+
+      Object.assign(card, {
+        ...(title !== undefined && { title }),
+        ...(description !== undefined && { description }),
+        ...(dueDate !== undefined && { dueDate }),
+        ...('assignedToId' in dto && {
+          assignedTo: dto.assignedToId
+            ? ({ id: dto.assignedToId } as Card['assignedTo'])
+            : null,
+        }),
+        ...(tags !== undefined && { tags }),
+      });
+
+      const savedCard = await queryRunner.manager.save(Card, card);
+
+      const updatedCard = await queryRunner.manager.findOne(Card, {
+        where: { id: savedCard.id },
+        relations: ['column', 'createdBy', 'assignedTo', 'tags'],
+      });
+
+      if (!updatedCard) {
+        throw new InternalServerErrorException('Failed to load updated card');
+      }
+
+      await queryRunner.commitTransaction();
+
+      this.eventEmitter.emit(
+        EVENTS.BOARD_COLUMN_CARD_UPDATED,
+        new CardUpdatedEvent(
+          boardId,
+          columnId,
+          updatedCard,
+          currentUserId,
+          oldCard,
+        ),
+      );
+
+      return updatedCard;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      console.error('Update Card Error:', error);
+      throw new InternalServerErrorException('Failed to update card');
     } finally {
       await queryRunner.release();
     }

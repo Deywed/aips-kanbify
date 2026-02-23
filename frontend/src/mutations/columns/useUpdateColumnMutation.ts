@@ -8,12 +8,12 @@ import { useBoardActions } from '@/stores/board.store';
 
 import { useBaseMutation } from '../useBaseMutation';
 
-import type { NewColumnSchemaType } from '@/pages/BoardDetails/components/column/newColumn.schema';
+import type { UpdateColumnPayload } from '@/pages/BoardDetails/components/column/newColumn.schema';
 
 export const useUpdateColumnMutation = (boardId: string, columnId: string) => {
   const { updateColumnTitle } = useBoardActions();
 
-  return useBaseMutation<Column, Error, Partial<NewColumnSchemaType>>(
+  return useBaseMutation<Column, Error, UpdateColumnPayload>(
     { path: API_ENDPOINTS.BOARD_COLUMN(boardId, columnId), method: 'PATCH' },
     {
       onSuccess: (updatedColumn) => {

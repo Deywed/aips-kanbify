@@ -21,6 +21,23 @@ export const createBoardCardsSlice: StateCreator<
       })),
     ),
 
+  updateCard: (columnId, cardId, newCard) =>
+    set(
+      withBoardUpdate((board) => ({
+        ...board,
+        columns: board.columns.map((column) =>
+          column.id === columnId
+            ? {
+                ...column,
+                cards: column.cards.map((card) =>
+                  card.id === cardId ? newCard : card,
+                ),
+              }
+            : column,
+        ),
+      })),
+    ),
+
   deleteCard: (columnId, cardId) =>
     set(
       withBoardUpdate((board) => ({

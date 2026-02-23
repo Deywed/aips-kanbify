@@ -39,6 +39,7 @@ export type BoardTagsSlice = {
 
 export type BoardCardsSlice = {
   addCard: (columnId: string, card: Card) => void;
+  updateCard: (columnId: string, cardId: string, newCard: Card) => void;
   deleteCard: (columnId: string, cardId: string) => void;
 };
 

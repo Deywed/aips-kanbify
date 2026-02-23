@@ -2,21 +2,41 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-
 import { Card } from 'src/card/entity/card.entity';
 import { User } from 'src/users/entity/user.entity';
 
 export enum CardActionType {
-  CREATED = 'CREATED',
   MOVED = 'MOVED',
   UPDATED = 'UPDATED',
   ASSIGNED = 'ASSIGNED',
-  TAG_ADDED = 'TAG_ADDED',
-  TAG_REMOVED = 'TAG_REMOVED',
 }
+
+export type MovedPayload = {
+  fromColumnId: string;
+  fromColumnName: string;
+  toColumnId: string;
+  toColumnName: string;
+};
+
+export type UpdatedPayload = {
+  field: 'title' | 'description' | 'dueDate';
+  oldValue: string | null;
+  newValue: string | null;
+};
+
+export type AssignedPayload = {
+  oldAssigneeId: string | null;
+  newAssigneeId: string | null;
+};
+
+export type CardHistoryPayload =
+  | MovedPayload
+  | UpdatedPayload
+  | AssignedPayload;
 
 @Entity('card_history')
 export class CardHistory {
@@ -27,14 +47,15 @@ export class CardHistory {
   action: CardActionType;
 
   @Column({ type: 'jsonb', nullable: true })
-  payload?: any; // { fromColumnId, toColumnId, oldValue, newValue }
+  payload: CardHistoryPayload | null;
 
   @CreateDateColumn()
   createdAt: Date;
 
+  @Index()
   @ManyToOne(() => Card, (card) => card.history, { onDelete: 'CASCADE' })
   card: Card;
 
-  @ManyToOne(() => User)
-  actor: User;
+  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+  actor: User | null;
 }

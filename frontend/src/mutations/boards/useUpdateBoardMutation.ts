@@ -4,14 +4,14 @@ import { toast } from 'sonner';
 import { API_ENDPOINTS } from '@/config/endpoints';
 
 import type { Board } from '@/types/board.types';
-import type { NewBoardSchemaType } from '@/pages/Boards/schema/newBoard.schema';
+import type { UpdateBoardPayload } from '@/pages/Boards/schema/newBoard.schema';
 
 import { useBaseMutation } from '../useBaseMutation';
 
 export const useUpdateBoardMutation = (boardId: string) => {
   const queryClient = useQueryClient();
 
-  return useBaseMutation<Board, Error, Partial<NewBoardSchemaType>>(
+  return useBaseMutation<Board, Error, UpdateBoardPayload>(
     {
       path: API_ENDPOINTS.BOARD(boardId),
       method: 'PATCH',

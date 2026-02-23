@@ -12,3 +12,10 @@ export const newBoardSchema = z.object({
 });
 
 export type NewBoardSchemaType = z.infer<typeof newBoardSchema>;
+
+export type UpdateBoardPayload = Partial<
+  Record<
+    keyof NewBoardSchemaType,
+    NewBoardSchemaType[keyof NewBoardSchemaType] | null
+  >
+>;
