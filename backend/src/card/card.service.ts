@@ -332,18 +332,29 @@ export class CardService {
     try {
       const savedCard = await this.cardRepo.save(card);
 
+      const movedCard = await this.cardRepo.findOne({
+        where: { id: savedCard.id },
+        relations: ['column', 'createdBy', 'assignedTo', 'tags'],
+      });
+
+      if (!movedCard) {
+        throw new InternalServerErrorException('Failed to load moved card');
+      }
+
       this.eventEmitter.emit(
         EVENTS.BOARD_COLUMN_CARD_MOVED,
         new CardMovedEvent(
           boardId,
           columnId,
           dto.newColumnId,
-          savedCard,
+          cardId,
+          newPosition,
+          movedCard,
           currentUserId,
         ),
       );
 
-      return savedCard;
+      return movedCard;
     } catch (error) {
       console.error('Move Card Error:', error);
       throw new InternalServerErrorException('Failed to move card');

@@ -78,3 +78,13 @@ export type CardDeletedPayload = {
   cardId: string;
   actorId: string;
 };
+
+export type CardMovedPayload = {
+  boardId: string;
+  oldColumnId: string;
+  newColumnId: string;
+  cardId: string;
+  newPosition: number;
+  card: Card;
+  actorId: string;
+};

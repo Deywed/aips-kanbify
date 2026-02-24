@@ -5,7 +5,9 @@ export class CardMovedEvent {
     public readonly boardId: string,
     public readonly oldColumnId: string,
     public readonly newColumnId: string,
+    public readonly cardId: string,
+    public readonly newPosition: number,
     public readonly card: Card,
-    public readonly userId: string,
+    public readonly actorId: string,
   ) {}
 }

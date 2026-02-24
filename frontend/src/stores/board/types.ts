@@ -41,6 +41,12 @@ export type BoardCardsSlice = {
   addCard: (columnId: string, card: Card) => void;
   updateCard: (columnId: string, cardId: string, newCard: Card) => void;
   deleteCard: (columnId: string, cardId: string) => void;
+  moveCard: (
+    fromColumnId: string,
+    toColumnId: string,
+    cardId: string,
+    updatedCard?: Card,
+  ) => void;
 };
 
 export type BoardState = BoardCoreSlice &

@@ -32,6 +32,8 @@ export const API_ENDPOINTS = {
     `/board/${boardId}/columns/${columnId}/cards/${cardId}`,
   DELETE_CARD: (boardId: string, columnId: string, cardId: string) =>
     `/board/${boardId}/columns/${columnId}/cards/${cardId}`,
+  MOVE_CARD: (boardId: string, columnId: string, cardId: string) =>
+    `/board/${boardId}/columns/${columnId}/cards/${cardId}/move`,
 
   NOTIFICATIONS_UNREAD_COUNT: '/notifications/unread-count',
 };
