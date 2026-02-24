@@ -13,6 +13,7 @@ export const SOCKET_EVENTS = {
     COLUMN_ADDED: 'board:columnAdded',
     COLUMN_REMOVED: 'board:columnRemoved',
     COLUMN_UPDATED: 'board:columnUpdated',
+    COLUMN_REORDERED: 'board:columnReordered',
 
     TAG_ADDED: 'board:tagAdded',
     TAG_REMOVED: 'board:tagRemoved',

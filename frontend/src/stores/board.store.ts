@@ -60,6 +60,7 @@ export const useBoardActions = () =>
       addColumn: state.addColumn,
       removeColumn: state.removeColumn,
       updateColumnTitle: state.updateColumnTitle,
+      reorderColumn: state.reorderColumn,
       addTag: state.addTag,
       deleteTag: state.deleteTag,
       updateTag: state.updateTag,

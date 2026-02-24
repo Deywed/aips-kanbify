@@ -37,6 +37,13 @@ export type BoardColumnUpdatedPayload = {
   actorId: string;
 };
 
+export type BoardColumnReorderedPayload = {
+  boardId: string;
+  columnId: string;
+  newPosition: number;
+  actorId: string;
+};
+
 // Board tags
 export type BoardTagAddedPayload = {
   tag: Tag;

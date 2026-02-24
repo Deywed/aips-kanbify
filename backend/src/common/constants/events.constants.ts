@@ -6,6 +6,7 @@ export const EVENTS = {
   BOARD_COLUMN_ADDED: 'board-column.added',
   BOARD_COLUMN_REMOVED: 'board-column.removed',
   BOARD_COLUMN_UPDATED: 'board-column.updated',
+  BOARD_COLUMN_REORDERED: 'board-column.reordered',
 
   BOARD_TAG_CREATED: 'board-tag.created',
   BOARD_TAG_UPDATED: 'board-tag.updated',

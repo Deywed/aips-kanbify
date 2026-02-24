@@ -9,6 +9,7 @@ import { BoardGateway } from '../board.gateway';
 import { BoardColumnAddedEvent } from 'src/board-column/events/board-column-added.event';
 import { BoardColumnRemovedEvent } from 'src/board-column/events/board-column-removed.event';
 import { BoardColumnUpdatedEvent } from 'src/board-column/events/board-column-updated.event';
+import { BoardColumnReorderedEvent } from 'src/board-column/events/board-column-reordered.event';
 
 @Injectable()
 export class BoardColumnListener {
@@ -37,6 +38,15 @@ export class BoardColumnListener {
     this.boardGateway.emitToBoard(
       event.boardId,
       SOCKET_EVENTS.BOARD.COLUMN_UPDATED,
+      event,
+    );
+  }
+
+  @OnEvent(EVENTS.BOARD_COLUMN_REORDERED)
+  handleBoardColumnReordered(event: BoardColumnReorderedEvent) {
+    this.boardGateway.emitToBoard(
+      event.boardId,
+      SOCKET_EVENTS.BOARD.COLUMN_REORDERED,
       event,
     );
   }

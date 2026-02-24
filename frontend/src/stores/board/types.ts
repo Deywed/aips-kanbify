@@ -29,6 +29,7 @@ export type BoardColumnsSlice = {
   addColumn: (column: Column) => void;
   removeColumn: (columnId: string) => void;
   updateColumnTitle: (columnId: string, newTitle: string) => void;
+  reorderColumn: (columnId: string, newPosition: number) => void;
 };
 
 export type BoardTagsSlice = {

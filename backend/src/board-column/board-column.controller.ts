@@ -61,11 +61,18 @@ export class BoardColumnController {
 
   @Patch(':columnId/reorder')
   reorderColumn(
+    @Req() req,
     @Param('boardId', ParseUUIDPipe) boardId: string,
     @Param('columnId', ParseUUIDPipe) columnId: string,
     @Body() dto: ReorderColumnDto,
   ) {
-    return this.columnService.reorderColumnAfter(boardId, columnId, dto);
+    const user = req['user'] as JwtPayload;
+    return this.columnService.reorderColumnAfter(
+      boardId,
+      columnId,
+      dto,
+      user.sub,
+    );
   }
 
   @Get()
