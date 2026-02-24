@@ -83,6 +83,8 @@ export class NotificationListener {
   async handleCardCreatedEvent({ boardId, card, actorId }: CardCreatedEvent) {
     if (!card.assignedTo) return;
 
+    if (actorId === card.assignedTo.id) return;
+
     await this.createAndSendNotification(
       card.assignedTo.id,
       {
@@ -107,6 +109,7 @@ export class NotificationListener {
     const newAssignedToId = card.assignedTo?.id ?? null;
 
     if (!newAssignedToId || oldAssignedToId === newAssignedToId) return;
+    if (actorId === newAssignedToId) return;
 
     await this.createAndSendNotification(
       newAssignedToId,
