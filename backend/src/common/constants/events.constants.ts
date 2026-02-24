@@ -14,4 +14,5 @@ export const EVENTS = {
   BOARD_COLUMN_CARD_CREATED: 'board-card.created',
   BOARD_COLUMN_CARD_UPDATED: 'board-card.updated',
   BOARD_COLUMN_CARD_DELETED: 'board-card.deleted',
+  BOARD_COLUMN_CARD_MOVED: 'board-card.moved',
 } as const;

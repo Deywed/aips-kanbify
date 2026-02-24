@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThan, Repository } from 'typeorm';
+import { MoreThan, Repository, Not } from 'typeorm';
 
 import { POSITION_GAP } from 'src/common/constants/positions.constant';
 
@@ -138,7 +138,7 @@ export class BoardColumnService {
     // Move to start
     if (!dto.afterId) {
       const first = await this.columnRepo.findOne({
-        where: { board: { id: boardId } },
+        where: { board: { id: boardId }, id: Not(columnId) },
         order: { position: 'ASC' },
       });
 
@@ -158,6 +158,7 @@ export class BoardColumnService {
         where: {
           board: { id: boardId },
           position: MoreThan(after.position),
+          id: Not(columnId),
         },
         order: { position: 'ASC' },
       });
