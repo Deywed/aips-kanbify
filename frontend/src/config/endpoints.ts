@@ -13,6 +13,8 @@ export const API_ENDPOINTS = {
   BOARD_COLUMNS: (boardId: string) => `/board/${boardId}/columns`,
   BOARD_COLUMN: (boardId: string, columnId: string) =>
     `/board/${boardId}/columns/${columnId}`,
+  REORDER_COLUMN: (boardId: string, columnId: string) =>
+    `/board/${boardId}/columns/${columnId}/reorder`,
 
   ADD_BOARD_MEMBER: (boardId: string) => `/board/${boardId}/members`,
   DELETE_BOARD_MEMBER: (boardId: string, userId: string) =>
@@ -32,6 +34,8 @@ export const API_ENDPOINTS = {
     `/board/${boardId}/columns/${columnId}/cards/${cardId}`,
   DELETE_CARD: (boardId: string, columnId: string, cardId: string) =>
     `/board/${boardId}/columns/${columnId}/cards/${cardId}`,
+  MOVE_CARD: (boardId: string, columnId: string, cardId: string) =>
+    `/board/${boardId}/columns/${columnId}/cards/${cardId}/move`,
 
   NOTIFICATIONS_UNREAD_COUNT: '/notifications/unread-count',
 };

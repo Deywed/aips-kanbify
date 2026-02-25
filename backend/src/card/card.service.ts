@@ -4,11 +4,12 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository, MoreThan, Not } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { EVENTS } from 'src/common/constants/events.constants';
+import { POSITION_GAP } from 'src/common/constants/positions.constant';
 
 import { BoardColumnService } from 'src/board-column/board-column.service';
 import { BoardMembersService } from 'src/board-members/board-members.service';
@@ -19,10 +20,12 @@ import { Card } from './entity/card.entity';
 
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
+import { MoveCardDto } from './dto/move-card.dto';
 
 import { CardCreatedEvent } from './events/card-created.event';
 import { CardDeletedEvent } from './events/card-deleted.event';
 import { CardUpdatedEvent } from './events/card-updated.event';
+import { CardMovedEvent } from './events/card-moved.event';
 
 import { TagService } from 'src/tag/tag.service';
 
@@ -249,5 +252,112 @@ export class CardService {
     }
 
     return { id: cardId };
+  }
+
+  async moveCard(
+    boardId: string,
+    columnId: string,
+    cardId: string,
+    dto: MoveCardDto,
+    currentUserId: string,
+  ) {
+    const card = await this.cardRepo.findOne({
+      where: {
+        id: cardId,
+        column: { id: columnId, board: { id: boardId } },
+      },
+      relations: ['column'],
+    });
+
+    if (!card) {
+      throw new NotFoundException('Card not found');
+    }
+
+    const newColumn = await this.columnRepo.findOne({
+      where: { id: dto.newColumnId, board: { id: boardId } },
+    });
+
+    if (!newColumn) {
+      throw new NotFoundException('Target column not found');
+    }
+
+    if (dto.afterCardId === cardId) {
+      throw new BadRequestException('Cannot move card after itself');
+    }
+
+    let newPosition: number;
+
+    if (!dto.afterCardId) {
+      // Move to the top of the new column
+      const firstCard = await this.cardRepo.findOne({
+        where: { column: { id: dto.newColumnId }, id: Not(cardId) },
+        order: { position: 'ASC' },
+      });
+
+      if (!firstCard) {
+        newPosition = POSITION_GAP;
+      } else {
+        newPosition = Number(firstCard.position) - POSITION_GAP;
+      }
+    } else {
+      // Move after a specific card
+      const afterCard = await this.cardRepo.findOne({
+        where: { id: dto.afterCardId, column: { id: dto.newColumnId } },
+      });
+
+      if (!afterCard) {
+        throw new NotFoundException('afterCardId not found in target column');
+      }
+
+      const nextCard = await this.cardRepo.findOne({
+        where: {
+          column: { id: dto.newColumnId },
+          position: MoreThan(afterCard.position),
+          id: Not(cardId),
+        },
+        order: { position: 'ASC' },
+      });
+
+      if (!nextCard) {
+        newPosition = Number(afterCard.position) + POSITION_GAP;
+      } else {
+        newPosition =
+          (Number(afterCard.position) + Number(nextCard.position)) / 2;
+      }
+    }
+
+    card.column = newColumn;
+    card.position = newPosition;
+
+    try {
+      const savedCard = await this.cardRepo.save(card);
+
+      const movedCard = await this.cardRepo.findOne({
+        where: { id: savedCard.id },
+        relations: ['column', 'createdBy', 'assignedTo', 'tags'],
+      });
+
+      if (!movedCard) {
+        throw new InternalServerErrorException('Failed to load moved card');
+      }
+
+      this.eventEmitter.emit(
+        EVENTS.BOARD_COLUMN_CARD_MOVED,
+        new CardMovedEvent(
+          boardId,
+          columnId,
+          dto.newColumnId,
+          cardId,
+          newPosition,
+          movedCard,
+          currentUserId,
+        ),
+      );
+
+      return movedCard;
+    } catch (error) {
+      console.error('Move Card Error:', error);
+      throw new InternalServerErrorException('Failed to move card');
+    }
   }
 }

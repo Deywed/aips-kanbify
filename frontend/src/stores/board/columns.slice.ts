@@ -40,4 +40,18 @@ export const createBoardColumnsSlice: StateCreator<
         ),
       })),
     ),
+
+  reorderColumn: (columnId, newPosition) =>
+    set(
+      withBoardUpdate((board) => ({
+        ...board,
+        columns: [...board.columns]
+          .map((column) =>
+            column.id === columnId
+              ? { ...column, position: newPosition }
+              : column,
+          )
+          .sort((a, b) => a.position - b.position),
+      })),
+    ),
 });

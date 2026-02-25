@@ -29,7 +29,7 @@ export class Card {
   @Column({ type: 'timestamp', nullable: true })
   dueDate?: Date;
 
-  @Column('numeric', { precision: 10, scale: 5 })
+  @Column({ type: 'double precision', default: 0 })
   position: number;
 
   @CreateDateColumn()

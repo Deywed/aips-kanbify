@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThan, Repository } from 'typeorm';
+import { MoreThan, Repository, Not } from 'typeorm';
 
 import { POSITION_GAP } from 'src/common/constants/positions.constant';
 
@@ -21,6 +21,7 @@ import { EVENTS } from 'src/common/constants/events.constants';
 import { BoardColumnAddedEvent } from './events/board-column-added.event';
 import { BoardColumnRemovedEvent } from './events/board-column-removed.event';
 import { BoardColumnUpdatedEvent } from './events/board-column-updated.event';
+import { BoardColumnReorderedEvent } from './events/board-column-reordered.event';
 
 @Injectable()
 export class BoardColumnService {
@@ -126,6 +127,7 @@ export class BoardColumnService {
     boardId: string,
     columnId: string,
     dto: ReorderColumnDto,
+    currentUserId: string,
   ) {
     if (dto.afterId === columnId) {
       throw new BadRequestException('Invalid afterId');
@@ -138,7 +140,7 @@ export class BoardColumnService {
     // Move to start
     if (!dto.afterId) {
       const first = await this.columnRepo.findOne({
-        where: { board: { id: boardId } },
+        where: { board: { id: boardId }, id: Not(columnId) },
         order: { position: 'ASC' },
       });
 
@@ -158,6 +160,7 @@ export class BoardColumnService {
         where: {
           board: { id: boardId },
           position: MoreThan(after.position),
+          id: Not(columnId),
         },
         order: { position: 'ASC' },
       });
@@ -173,6 +176,15 @@ export class BoardColumnService {
 
     try {
       await this.columnRepo.save(column);
+      this.eventEmitter.emit(
+        EVENTS.BOARD_COLUMN_REORDERED,
+        new BoardColumnReorderedEvent(
+          boardId,
+          columnId,
+          newPosition,
+          currentUserId,
+        ),
+      );
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException('Failed to reorder column');

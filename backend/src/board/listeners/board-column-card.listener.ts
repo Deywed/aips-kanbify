@@ -9,6 +9,7 @@ import { BoardGateway } from '../board.gateway';
 import { CardCreatedEvent } from 'src/card/events/card-created.event';
 import { CardDeletedEvent } from 'src/card/events/card-deleted.event';
 import { CardUpdatedEvent } from 'src/card/events/card-updated.event';
+import { CardMovedEvent } from 'src/card/events/card-moved.event';
 
 @Injectable()
 export class BoardColumnCardListener {
@@ -37,6 +38,15 @@ export class BoardColumnCardListener {
     this.boardGateway.emitToBoard(
       event.boardId,
       SOCKET_EVENTS.BOARD.COLUMN_CARD_UPDATED,
+      event,
+    );
+  }
+
+  @OnEvent(EVENTS.BOARD_COLUMN_CARD_MOVED)
+  handleBoardColumnCardMoved(event: CardMovedEvent) {
+    this.boardGateway.emitToBoard(
+      event.boardId,
+      SOCKET_EVENTS.BOARD.COLUMN_CARD_MOVED,
       event,
     );
   }

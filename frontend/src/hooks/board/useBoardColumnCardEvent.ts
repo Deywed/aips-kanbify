@@ -10,13 +10,14 @@ import { useAuthUser } from '@/stores/auth.store';
 import type {
   CardAddedPayload,
   CardDeletedPayload,
+  CardMovedPayload,
   CardUpdatedPayload,
 } from '@/types/socket-events.types';
 
 import { useSocketSubscription } from '../useSocketSubscription';
 
 const useBoardColumnCardEvent = (socket: Socket | null) => {
-  const { addCard, updateCard, deleteCard } = useBoardActions();
+  const { addCard, updateCard, deleteCard, moveCard } = useBoardActions();
   const currentUser = useAuthUser();
 
   const handleCardAdded = useCallback(
@@ -63,6 +64,26 @@ const useBoardColumnCardEvent = (socket: Socket | null) => {
     socket,
     SOCKET_EVENTS.BOARD.COLUMN_CARD_DELETED,
     handleCardDeleted,
+  );
+
+  const handleCardMoved = useCallback(
+    (payload: CardMovedPayload) => {
+      if (payload.actorId !== currentUser?.id) {
+        moveCard(
+          payload.oldColumnId,
+          payload.newColumnId,
+          payload.cardId,
+          payload.card,
+        );
+      }
+    },
+    [moveCard, currentUser?.id],
+  );
+
+  useSocketSubscription(
+    socket,
+    SOCKET_EVENTS.BOARD.COLUMN_CARD_MOVED,
+    handleCardMoved,
   );
 };
 

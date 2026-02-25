@@ -10,13 +10,15 @@ import { useAuthUser } from '@/stores/auth.store';
 import type {
   BoardColumnAddedPayload,
   BoardColumnRemovedPayload,
+  BoardColumnReorderedPayload,
   BoardColumnUpdatedPayload,
 } from '@/types/socket-events.types';
 
 import { useSocketSubscription } from '../useSocketSubscription';
 
 const useBoardColumnEvent = (socket: Socket | null) => {
-  const { addColumn, removeColumn, updateColumnTitle } = useBoardActions();
+  const { addColumn, removeColumn, updateColumnTitle, reorderColumn } =
+    useBoardActions();
   const currentUser = useAuthUser();
 
   const handleColumnAdded = useCallback(
@@ -60,6 +62,21 @@ const useBoardColumnEvent = (socket: Socket | null) => {
     socket,
     SOCKET_EVENTS.BOARD.COLUMN_UPDATED,
     handleColumnUpdated,
+  );
+
+  const handleColumnReordered = useCallback(
+    (payload: BoardColumnReorderedPayload) => {
+      if (payload.actorId !== currentUser?.id) {
+        reorderColumn(payload.columnId, payload.newPosition);
+      }
+    },
+    [reorderColumn, currentUser?.id],
+  );
+
+  useSocketSubscription(
+    socket,
+    SOCKET_EVENTS.BOARD.COLUMN_REORDERED,
+    handleColumnReordered,
   );
 };
 

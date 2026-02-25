@@ -78,6 +78,7 @@ const BoardColumnDialog = ({
         onSuccess: () => {
           toast.success('Column created successfully!');
           open(false);
+          form.reset();
         },
       });
     }

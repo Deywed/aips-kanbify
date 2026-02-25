@@ -17,6 +17,7 @@ import { CardService } from './card.service';
 
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
+import { MoveCardDto } from './dto/move-card.dto';
 
 @Controller('/board/:boardId/columns/:columnId/cards')
 @UseGuards(BoardRoleGuard)
@@ -61,5 +62,17 @@ export class CardController {
       dto,
       user.sub,
     );
+  }
+
+  @Patch(':cardId/move')
+  moveCard(
+    @Req() req: Request,
+    @Param('boardId', ParseUUIDPipe) boardId: string,
+    @Param('columnId', ParseUUIDPipe) columnId: string,
+    @Param('cardId', ParseUUIDPipe) cardId: string,
+    @Body() dto: MoveCardDto,
+  ) {
+    const user = req['user'] as JwtPayload;
+    return this.cardService.moveCard(boardId, columnId, cardId, dto, user.sub);
   }
 }

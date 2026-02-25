@@ -19,7 +19,7 @@ export class BoardColumn {
   @Column()
   title: string;
 
-  @Column('numeric', { precision: 10, scale: 5 })
+  @Column({ type: 'double precision', default: 0 })
   position: number;
 
   @CreateDateColumn()

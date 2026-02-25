@@ -37,6 +37,13 @@ export type BoardColumnUpdatedPayload = {
   actorId: string;
 };
 
+export type BoardColumnReorderedPayload = {
+  boardId: string;
+  columnId: string;
+  newPosition: number;
+  actorId: string;
+};
+
 // Board tags
 export type BoardTagAddedPayload = {
   tag: Tag;
@@ -76,5 +83,15 @@ export type CardDeletedPayload = {
   boardId: string;
   columnId: string;
   cardId: string;
+  actorId: string;
+};
+
+export type CardMovedPayload = {
+  boardId: string;
+  oldColumnId: string;
+  newColumnId: string;
+  cardId: string;
+  newPosition: number;
+  card: Card;
   actorId: string;
 };
