@@ -32,7 +32,7 @@ const BoardMembersAvatars = ({
         members
           .slice(0, maxVisible)
           .map((member) => (
-            <UserAvatar key={member.id} user={member} showTooltip />
+            <UserAvatar key={member.id} user={member} showTooltip link />
           ))}
 
       {remainingCount > 0 && (

@@ -4,7 +4,9 @@ export const API_ENDPOINTS = {
   REFRESH_TOKEN: '/auth/refresh',
   LOGOUT: '/auth/logout',
 
-  USERS: '/users',
+  USERS: '/users', // GETE, PATCH
+  USER: (userId: string) => `/users/${userId}`,
+  USER_AVATAR: '/users/avatar', // PUT and DELETE
   USERS_SEARCH: '/users/search',
 
   BOARDS: '/board',

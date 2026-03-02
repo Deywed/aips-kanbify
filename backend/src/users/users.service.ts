@@ -13,6 +13,7 @@ import { BoardMember } from 'src/board-members/entity/board-members.entity';
 import { User } from './entity/user.entity';
 
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -44,6 +45,22 @@ export class UsersService {
       .setParameter('currentUserId', currentUserId)
       .limit(10)
       .getMany();
+  }
+
+  getUserById(id: string) {
+    return this.userRepo.findOne({ where: { id } });
+  }
+
+  async updateUserInfo(updateUserDto: UpdateUserDto, currentUserId: string) {
+    const user = await this.userRepo.findOne({ where: { id: currentUserId } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    Object.assign(user, updateUserDto);
+
+    return this.userRepo.save(user);
   }
 
   async updateUserAvatar(image: Express.Multer.File, userId: string) {

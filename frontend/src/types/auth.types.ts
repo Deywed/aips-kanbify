@@ -9,6 +9,7 @@ export type User = {
   bio?: string;
   avatarUrl?: string;
   avatarPublicId?: string;
+  createdAt: string;
 };
 
 export type BoardMember = User & {
