@@ -5,9 +5,12 @@ import type { User } from '@/types/auth.types';
 
 import { useBaseMutation } from '../useBaseMutation';
 
+import { useAuthActions } from '@/stores/auth.store';
+
 import type { UserInfoSchemaType } from '@/pages/Profile/schema/userInfo.schema';
 
 export const useEditProfileInfoMutation = () => {
+  const { setUser } = useAuthActions();
   const queryClient = useQueryClient();
 
   return useBaseMutation<User, Error, UserInfoSchemaType>(
@@ -35,6 +38,8 @@ export const useEditProfileInfoMutation = () => {
         queryClient.invalidateQueries({
           queryKey: [API_ENDPOINTS.BOARDS],
         });
+
+        setUser(updatedUser);
       },
       onError: (error) => {
         console.error(error);
