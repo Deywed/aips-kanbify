@@ -2,11 +2,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { HugeiconsIcon } from '@hugeicons/react';
-import {
-  Calendar03Icon,
-  Delete02Icon,
-  Edit02Icon,
-} from '@hugeicons/core-free-icons';
+import { Calendar03Icon, Edit02Icon } from '@hugeicons/core-free-icons';
 
 import { formatDate, getUserFullName } from '@/lib/utils';
 
@@ -29,9 +25,9 @@ import H2 from '@/components/ui/typography/H2';
 import H4 from '@/components/ui/typography/H4';
 import Header from '@/components/common/Header';
 import BlockUI from '@/components/common/BlockUI';
-import UserAvatar from '@/components/common/UserAvatar';
 
 import UserInfoFormDialog from './components/UserInfoFormDialog';
+import UserAvatarSection from './components/UserAvatarSection';
 
 const ProfilePage = () => {
   const { id } = useParams();
@@ -54,24 +50,7 @@ const ProfilePage = () => {
       <div className="flex size-full p-4">
         <BlockUI isLoading={isLoading} isError={isError}>
           <div className="flex flex-col gap-4 md:flex-row">
-            <Card>
-              <CardContent className="flex flex-col items-center gap-4">
-                <UserAvatar user={data} size={32} />
-              </CardContent>
-
-              {currentUser?.id === data?.id && (
-                <CardFooter className="flex flex-col items-center justify-center gap-2 sm:flex-row">
-                  <Button variant="outline" className="w-full sm:w-auto">
-                    <HugeiconsIcon icon={Edit02Icon} />
-                    Change Avatar
-                  </Button>
-                  <Button variant="destructive" className="w-full sm:w-auto">
-                    <HugeiconsIcon icon={Delete02Icon} />
-                    Delete
-                  </Button>
-                </CardFooter>
-              )}
-            </Card>
+            <UserAvatarSection user={data} />
 
             <Card className="flex-1">
               <CardHeader className="flex justify-between gap-4">

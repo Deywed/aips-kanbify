@@ -38,7 +38,7 @@ const UserAvatar = ({
     () => (
       <Avatar
         className={cn(
-          'relative shrink-0 cursor-pointer',
+          'relative shrink-0 cursor-pointer border',
           `size-${size}`,
           className,
         )}
