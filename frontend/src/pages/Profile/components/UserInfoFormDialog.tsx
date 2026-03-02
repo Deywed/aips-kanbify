@@ -115,7 +115,7 @@ const UserInfoFormDialog = ({
               type="submit"
               disabled={isPending || !form.formState.isDirty}
             >
-              <LoadingSwap isLoading={isPending}>Save changes</LoadingSwap>
+              <LoadingSwap isLoading={isPending}>Save</LoadingSwap>
             </Button>
           </DialogFooter>
         </form>
