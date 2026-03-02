@@ -5,6 +5,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter/dist/event-emitter.mod
 import { createTypeOrmOptions } from './database/typeorm.config';
 
 import { JwtGlobalModule } from './jwt/jwt.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { AuthModule } from './auth/auth.module';
 import { BoardModule } from './board/board.module';
 import { BoardMembersModule } from './board-members/board-members.module';
@@ -32,6 +33,7 @@ import { UsersModule } from './users/users.module';
       maxListeners: 10,
     }),
     JwtGlobalModule,
+    CloudinaryModule,
     AuthModule,
     BoardModule,
     BoardMembersModule,
