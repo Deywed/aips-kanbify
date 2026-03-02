@@ -13,6 +13,7 @@ import RegisterPage from '@/pages/Register';
 import NotFoundPage from '@/pages/NotFound';
 import BoardsPage from '@/pages/Boards';
 import BoardDetailsPage from '@/pages/BoardDetails';
+import ProfilePage from '@/pages/Profile';
 
 export const router = createBrowserRouter([
   {
@@ -39,6 +40,7 @@ export const router = createBrowserRouter([
         children: [
           { path: '/boards', element: <BoardsPage /> },
           { path: '/boards/:boardId', element: <BoardDetailsPage /> },
+          { path: '/users/:id', element: <ProfilePage /> },
         ],
       },
     ],
