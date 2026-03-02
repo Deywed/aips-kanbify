@@ -1,7 +1,12 @@
 import {
+  BadRequestException,
+  Body,
   Controller,
   Delete,
   Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
   Put,
   Query,
   Req,
@@ -10,6 +15,8 @@ import {
 } from '@nestjs/common';
 
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
+
+import { UpdateUserDto } from './dto/update-user.dto';
 
 import { ImageUploadInterceptor } from 'src/common/interceptors/image-upload.interceptor';
 
@@ -27,6 +34,22 @@ export class UsersController {
   ) {
     const user = req['user'] as JwtPayload;
     return this.usersService.searchUsers(query, excludeBoardId, user.sub);
+  }
+
+  @Get(':id')
+  getUserById(@Param('id', ParseUUIDPipe) id: string) {
+    return this.usersService.getUserById(id);
+  }
+
+  @Patch()
+  updateUserInfo(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
+    const user = req['user'] as JwtPayload;
+
+    if (!updateUserDto.firstName || !updateUserDto.lastName) {
+      throw new BadRequestException('First name and last name cannot be empty');
+    }
+
+    return this.usersService.updateUserInfo(updateUserDto, user.sub);
   }
 
   @Put('avatar')

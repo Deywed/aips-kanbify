@@ -40,11 +40,15 @@ export function formatRelativeDate(date: Date | string | number): string {
   return `${years}y ago`;
 }
 
-export const getUserFullName = (user: User) =>
-  `${user.firstName} ${user.lastName}`;
+export const getUserFullName = (user: User | null | undefined) => {
+  if (!user) return '';
+  return `${user.firstName} ${user.lastName}`;
+};
 
-export const getAvatarFallback = (user: User) =>
-  user.firstName.charAt(0) + user.lastName.charAt(0);
+export const getAvatarFallback = (user: User | null | undefined) => {
+  if (!user) return '';
+  return user.firstName.charAt(0) + user.lastName.charAt(0);
+};
 
 export const roleToLabel = (role?: BoardRole) => {
   return role ? role.charAt(0) + role.slice(1).toLowerCase() : 'unknown';

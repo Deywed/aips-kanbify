@@ -12,4 +12,6 @@ export const APP_ROUTES = {
 
   CARD_DETAILS: (boardId: string, cardId: string) =>
     `/boards/${boardId}?card=${cardId}`,
+
+  ASSIGNED_CARDS: '/assigned-cards',
 };

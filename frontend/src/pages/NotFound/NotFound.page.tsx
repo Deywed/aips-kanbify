@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft02Icon, Sad01Icon } from '@hugeicons/core-free-icons';
+import { ArrowLeft02Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty';
+import Logo from '@/components/common/Logo';
 
 const NotFoundPage = () => {
   const navigate = useNavigate();
@@ -19,8 +20,8 @@ const NotFoundPage = () => {
     <main className="mx-auto flex h-screen w-fit items-center justify-center">
       <Empty className="border">
         <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <HugeiconsIcon icon={Sad01Icon} />
+          <EmptyMedia>
+            <Logo size={64} />
           </EmptyMedia>
           <EmptyTitle>Oops! Nothing here...</EmptyTitle>
           <EmptyDescription>

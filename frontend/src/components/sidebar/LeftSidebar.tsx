@@ -3,6 +3,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import {
   DashboardSquare01Icon,
   Notification02Icon,
+  Task01Icon,
   UserIcon,
 } from '@hugeicons/core-free-icons';
 import { cn } from '@/lib/utils';
@@ -26,6 +27,7 @@ const sidebarLinks = [
     icon: Notification02Icon,
   },
   { label: 'Profile', to: APP_ROUTES.USERS, icon: UserIcon },
+  { label: 'Assigned Cards', to: APP_ROUTES.ASSIGNED_CARDS, icon: Task01Icon },
 ];
 
 const LeftSidebar = () => {

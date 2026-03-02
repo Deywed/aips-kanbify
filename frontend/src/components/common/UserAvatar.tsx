@@ -5,7 +5,7 @@ import { StarIcon } from '@hugeicons/core-free-icons';
 import { navigateTo } from '@/lib/navigation';
 import { cn, getAvatarFallback, getUserFullName } from '@/lib/utils';
 
-import type { BoardMember } from '@/types/auth.types';
+import type { BoardMember, User } from '@/types/auth.types';
 
 import {
   Tooltip,
@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/avatar';
 
 type UserAvatarProps = {
-  user: BoardMember;
+  user?: BoardMember | User;
   size?: number;
   className?: string;
   showTooltip?: boolean;
@@ -38,7 +38,7 @@ const UserAvatar = ({
     () => (
       <Avatar
         className={cn(
-          'relative shrink-0 cursor-pointer',
+          'relative shrink-0 cursor-pointer border',
           `size-${size}`,
           className,
         )}
@@ -46,16 +46,16 @@ const UserAvatar = ({
           e.stopPropagation();
 
           if (link) {
-            navigateTo(`/users/${user.id}`);
+            navigateTo(`/users/${user?.id}`);
           }
         }}
       >
         <AvatarImage
-          src={user.avatarUrl}
+          src={user?.avatarUrl}
           alt={`${getUserFullName(user)} avatar`}
         />
         <AvatarFallback>{getAvatarFallback(user)}</AvatarFallback>
-        {user.role && user.role === 'ADMIN' && (
+        {user && 'role' in user && user.role && user.role === 'ADMIN' && (
           <AvatarBadge className="left-0 ring-1">
             <HugeiconsIcon icon={StarIcon} />
           </AvatarBadge>
@@ -73,7 +73,7 @@ const UserAvatar = ({
     <Tooltip>
       <TooltipTrigger render={avatar} />
       <TooltipContent>
-        <span>@{user.username}</span>
+        <span>@{user?.username}</span>
       </TooltipContent>
     </Tooltip>
   );
