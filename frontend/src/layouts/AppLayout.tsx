@@ -1,0 +1,30 @@
+import { useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
+
+import { setNavigator } from '@/lib/navigation';
+
+import { useInitNotifications } from '@/hooks/notifications/useInitNotifications';
+
+import LeftSidebar from '@/components/sidebar/LeftSidebar';
+
+const AppLayout = () => {
+  useInitNotifications();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setNavigator(navigate);
+  }, [navigate]);
+
+  return (
+    <div className="flex">
+      <LeftSidebar />
+
+      <main className="flex min-w-0 flex-1 flex-col">
+        <Outlet />
+      </main>
+    </div>
+  );
+};
+
+export default AppLayout;
