@@ -1,3 +1,5 @@
+import { SEARCH_PARAMS } from './searchParams';
+
 export const APP_ROUTES = {
   LOGIN: '/login',
   REGISTER: '/register',
@@ -11,7 +13,7 @@ export const APP_ROUTES = {
   USER_DETAILS: (userId: string) => `/users/${userId}`,
 
   CARD_DETAILS: (boardId: string, cardId: string) =>
-    `/boards/${boardId}?card=${cardId}`,
+    `/boards/${boardId}?${SEARCH_PARAMS.CARD_ID}=${cardId}`,
 
   ASSIGNED_CARDS: '/assigned-cards',
 };

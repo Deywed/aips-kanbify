@@ -88,7 +88,7 @@ const UserAvatarSection = ({ user }: UserAvatarSectionProps) => {
   return (
     <Card>
       <CardContent className="flex flex-col items-center gap-4">
-        <UserAvatar user={displayUser} size={32} />
+        <UserAvatar user={displayUser} className="size-32" />
       </CardContent>
 
       {isCurrentUser && (

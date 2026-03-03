@@ -43,7 +43,7 @@ const ProfilePage = () => {
 
   return (
     <>
-      <Header className="flex justify-between gap-4">
+      <Header showBackButton={currentUser?.id !== id}>
         <H2>{isError ? 'Error loading user profile' : 'User Profile'}</H2>
       </Header>
 

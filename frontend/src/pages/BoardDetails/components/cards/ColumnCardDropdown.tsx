@@ -53,19 +53,32 @@ const ColumnCardDropdown = ({
         <DropdownMenuTrigger
           className={className}
           render={
-            <Button size="icon-sm" variant="outline">
+            <Button
+              size="icon-sm"
+              variant="outline"
+              onClick={(e) => e.stopPropagation()}
+            >
               <HugeiconsIcon icon={MoreHorizontalIcon} />
             </Button>
           }
         />
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsEditDialogOpen(true);
+            }}
+          >
             <HugeiconsIcon icon={PencilEdit01Icon} />
             Edit
           </DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"
-            onClick={() => setIsDeleteDialogOpen(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsDeleteDialogOpen(true);
+            }}
           >
             <HugeiconsIcon icon={Delete02Icon} />
             Delete
@@ -73,21 +86,22 @@ const ColumnCardDropdown = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <DeleteConfirmDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-        title="Are you sure you want to delete this card?"
-        description="This action cannot be undone."
-        onConfirm={handleDeleteCard}
-        isLoading={isPending}
-      />
-
-      <ColumnCardDialog
-        isOpen={isEditDialogOpen}
-        open={setIsEditDialogOpen}
-        columnId={columnId}
-        initialCard={card}
-      />
+      <div onClick={(e) => e.stopPropagation()} className="contents">
+        <DeleteConfirmDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          title="Are you sure you want to delete this card?"
+          description="This action cannot be undone."
+          onConfirm={handleDeleteCard}
+          isLoading={isPending}
+        />
+        <ColumnCardDialog
+          isOpen={isEditDialogOpen}
+          open={setIsEditDialogOpen}
+          columnId={columnId}
+          initialCard={card}
+        />
+      </div>
     </>
   );
 };

@@ -35,7 +35,7 @@ const LeftSidebar = () => {
   const unreadCount = useUnreadNotificationsCount();
 
   return (
-    <aside className="sticky top-0 flex h-screen w-64 flex-col gap-8 border-r p-4">
+    <aside className="sticky top-0 flex h-screen w-72 flex-col gap-8 border-r p-4">
       <Logo size={54} className="ml-2" />
 
       <nav className="flex flex-col gap-2">
@@ -56,7 +56,7 @@ const LeftSidebar = () => {
                     variant: isActive ? 'outline' : 'ghost',
                     size: 'lg',
                   }),
-                  'w-full justify-start',
+                  'w-full justify-start gap-2',
                   isActive && 'font-semibold',
                 )
               }

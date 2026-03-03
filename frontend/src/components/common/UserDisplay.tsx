@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { getUserFullName } from '@/lib/utils';
+import { cn, getUserFullName } from '@/lib/utils';
 
 import { APP_ROUTES } from '@/config/appRoutes';
 
@@ -11,9 +11,10 @@ import UserAvatar from './UserAvatar';
 type UserDisplayProps = {
   user: User;
   link?: boolean;
+  className?: string;
 };
 
-const UserDisplay = ({ user, link }: UserDisplayProps) => {
+const UserDisplay = ({ user, link, className }: UserDisplayProps) => {
   const content = useMemo(
     () => (
       <>
@@ -33,14 +34,14 @@ const UserDisplay = ({ user, link }: UserDisplayProps) => {
     return (
       <Link
         to={APP_ROUTES.USER_DETAILS(user.id)}
-        className="group flex w-full gap-2"
+        className={cn('group flex w-full gap-2', className)}
       >
         {content}
       </Link>
     );
   }
 
-  return <div className="flex w-full gap-2">{content}</div>;
+  return <div className={cn('flex w-full gap-2', className)}>{content}</div>;
 };
 
 export default UserDisplay;
