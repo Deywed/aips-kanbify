@@ -7,7 +7,7 @@ import { API_ENDPOINTS } from '@/config/endpoints';
 
 import { type Board } from '@/types/board.types';
 
-import H3 from '@/components/ui/typography/H2';
+import H3 from '@/components/ui/typography/H3';
 import { Button } from '@/components/ui/button';
 
 import Header from '@/components/common/Header';

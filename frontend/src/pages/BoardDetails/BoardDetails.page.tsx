@@ -77,7 +77,7 @@ const BoardDetailsPage = () => {
 
   return (
     <>
-      <Header showBackButton>
+      <Header>
         <div className="flex w-full justify-between gap-2">
           <div className="flex items-center gap-2">
             <H3>

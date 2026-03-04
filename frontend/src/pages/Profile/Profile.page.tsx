@@ -21,7 +21,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import H2 from '@/components/ui/typography/H2';
+import H3 from '@/components/ui/typography/H3';
 import H4 from '@/components/ui/typography/H4';
 import Header from '@/components/common/Header';
 import BlockUI from '@/components/common/BlockUI';
@@ -43,8 +43,8 @@ const ProfilePage = () => {
 
   return (
     <>
-      <Header showBackButton={currentUser?.id !== id}>
-        <H2>{isError ? 'Error loading user profile' : 'User Profile'}</H2>
+      <Header>
+        <H3>{isError ? 'Error loading user profile' : 'User Profile'}</H3>
       </Header>
 
       <div className="flex size-full p-4">

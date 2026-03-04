@@ -58,7 +58,7 @@ const BoardColumns = ({ isError }: BoardColumnsProps) => {
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
         >
-          <ScrollArea className="h-full w-full pb-4">
+          <ScrollArea className="size-full">
             <div className="inline-flex gap-4 pb-2" tabIndex={-1}>
               {columnOrder.map((colId, colIndex) => {
                 const column = columnsMap.get(colId);
