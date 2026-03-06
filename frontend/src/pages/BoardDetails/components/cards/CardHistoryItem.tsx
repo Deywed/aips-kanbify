@@ -127,8 +127,15 @@ const CardHistoryItem = ({ entry }: CardHistoryItemProps) => {
   return (
     <div className="flex flex-col gap-2 border-b pb-4">
       <div className="flex items-center gap-2">
-        <UserAvatar user={entry.actor} size={6} />
-        <span>{getUserFullName(entry.actor)}</span>
+        <Link
+          to={APP_ROUTES.USER_DETAILS(entry.actor.id)}
+          className="group flex items-center gap-2"
+        >
+          <UserAvatar user={entry.actor} size={6} />
+          <span className="group-hover:text-primary underline-offset-4 group-hover:underline">
+            {getUserFullName(entry.actor)}
+          </span>
+        </Link>
         <Separator orientation="vertical" />
         <span className="text-muted-foreground">
           {formatRelativeDate(entry.createdAt)}
