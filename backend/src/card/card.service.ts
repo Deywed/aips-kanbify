@@ -285,6 +285,8 @@ export class CardService {
       throw new BadRequestException('Cannot move card after itself');
     }
 
+    const oldColumnName = card.column.title;
+
     let newPosition: number;
 
     if (!dto.afterCardId) {
@@ -347,6 +349,8 @@ export class CardService {
           boardId,
           columnId,
           dto.newColumnId,
+          oldColumnName,
+          newColumn.title,
           cardId,
           newPosition,
           movedCard,

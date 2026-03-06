@@ -10,6 +10,7 @@ import { Card } from 'src/card/entity/card.entity';
 import { User } from 'src/users/entity/user.entity';
 
 export enum CardActionType {
+  CREATED = 'CREATED',
   MOVED = 'MOVED',
   UPDATED = 'UPDATED',
   ASSIGNED = 'ASSIGNED',
@@ -30,13 +31,16 @@ export type UpdatedPayload = {
 
 export type AssignedPayload = {
   oldAssigneeId: string | null;
+  oldAssigneeName: string | null;
   newAssigneeId: string | null;
+  newAssigneeName: string | null;
 };
 
 export type CardHistoryPayload =
   | MovedPayload
   | UpdatedPayload
-  | AssignedPayload;
+  | AssignedPayload
+  | null;
 
 @Entity('card_history')
 export class CardHistory {
@@ -47,7 +51,7 @@ export class CardHistory {
   action: CardActionType;
 
   @Column({ type: 'jsonb', nullable: true })
-  payload: CardHistoryPayload | null;
+  payload: CardHistoryPayload;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -56,6 +60,6 @@ export class CardHistory {
   @ManyToOne(() => Card, (card) => card.history, { onDelete: 'CASCADE' })
   card: Card;
 
-  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL', eager: true })
   actor: User | null;
 }
