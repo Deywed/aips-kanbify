@@ -132,17 +132,15 @@ const ColumnCardDetailsDialog = ({ isOpen, open, card }: Props) => {
                 }
               />
               <CollapsibleContent className="px-2 pt-4">
-                {
-                  <BlockUI
-                    isLoading={isLoading}
-                    isEmpty={!data || data.length === 0}
-                    className="flex flex-col gap-4"
-                  >
-                    {data?.map((entry) => (
-                      <CardHistoryItem key={entry.id} entry={entry} />
-                    ))}
-                  </BlockUI>
-                }
+                <BlockUI
+                  isLoading={isLoading}
+                  isEmpty={!data || data.length === 0}
+                  className="flex flex-col gap-4"
+                >
+                  {data?.map((entry) => (
+                    <CardHistoryItem key={entry.id} entry={entry} />
+                  ))}
+                </BlockUI>
               </CollapsibleContent>
             </Collapsible>
 
