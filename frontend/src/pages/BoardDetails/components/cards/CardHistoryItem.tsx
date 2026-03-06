@@ -19,6 +19,9 @@ type CardHistoryItemProps = {
 const CardHistoryItem = ({ entry }: CardHistoryItemProps) => {
   const renderAction = () => {
     switch (entry.action) {
+      case 'CREATED': {
+        return <span>Created the card</span>;
+      }
       case 'UPDATED': {
         const payload = entry.payload as UpdatedPayload;
 
