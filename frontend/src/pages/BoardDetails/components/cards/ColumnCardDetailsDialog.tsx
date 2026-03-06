@@ -1,10 +1,13 @@
 import type { Dispatch, SetStateAction } from 'react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ArrowDown01Icon } from '@hugeicons/core-free-icons';
 
 import { formatDate } from '@/lib/utils';
 
 import { SEARCH_PARAMS } from '@/config/searchParams';
 
 import type { Card } from '@/types/board.types';
+import type { CardHistoryEntry } from '@/types/card-history.types';
 
 import useSearchParams from '@/hooks/useSearchParams';
 
@@ -19,6 +22,18 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 import UserDisplay from '@/components/common/UserDisplay';
 import { Badge } from '@/components/ui/badge';
+import { useQuery } from '@tanstack/react-query';
+import { API_ENDPOINTS } from '@/config/endpoints';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import { Button } from '@/components/ui/button';
+
+import BlockUI from '@/components/common/BlockUI';
+
+import CardHistoryItem from './CardHistoryItem';
 
 type Props = {
   isOpen: boolean;
@@ -28,6 +43,12 @@ type Props = {
 
 const ColumnCardDetailsDialog = ({ isOpen, open, card }: Props) => {
   const { removeSearchParam } = useSearchParams();
+
+  const { data, isLoading } = useQuery<CardHistoryEntry[]>({
+    queryKey: [API_ENDPOINTS.GET_CARD_HISTORY(card.id)],
+    enabled: isOpen,
+    staleTime: 0,
+  });
 
   return (
     <Dialog
@@ -97,6 +118,33 @@ const ColumnCardDetailsDialog = ({ isOpen, open, card }: Props) => {
                 'No due date set'
               )}
             </div>
+
+            <Collapsible className="rounded-md border p-4">
+              <CollapsibleTrigger
+                render={
+                  <Button variant="ghost" className="w-full">
+                    Card history
+                    <HugeiconsIcon
+                      icon={ArrowDown01Icon}
+                      className="ml-auto group-data-panel-open/button:rotate-180"
+                    />
+                  </Button>
+                }
+              />
+              <CollapsibleContent className="px-2 pt-4">
+                {
+                  <BlockUI
+                    isLoading={isLoading}
+                    isEmpty={!data || data.length === 0}
+                    className="flex flex-col gap-4"
+                  >
+                    {data?.map((entry) => (
+                      <CardHistoryItem key={entry.id} entry={entry} />
+                    ))}
+                  </BlockUI>
+                }
+              </CollapsibleContent>
+            </Collapsible>
 
             <span className="text-muted-foreground ml-auto text-sm">
               Last updated at:{' '}

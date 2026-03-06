@@ -30,7 +30,8 @@ export function formatRelativeDate(date: Date | string | number): string {
   const months = Math.floor(days / 30);
   const years = Math.floor(days / 365);
 
-  if (seconds < 60) return 'few seconds ago';
+  if (seconds < 10) return 'few seconds ago';
+  if (seconds < 60) return `${seconds}s ago`;
   if (minutes < 60) return `${minutes}m ago`;
   if (hours < 24) return `${hours}h ago`;
   if (days < 7) return `${days}d ago`;

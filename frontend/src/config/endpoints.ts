@@ -38,6 +38,7 @@ export const API_ENDPOINTS = {
     `/board/${boardId}/columns/${columnId}/cards/${cardId}`,
   MOVE_CARD: (boardId: string, columnId: string, cardId: string) =>
     `/board/${boardId}/columns/${columnId}/cards/${cardId}/move`,
+  GET_CARD_HISTORY: (cardId: string) => `/cards/${cardId}/history`,
 
   NOTIFICATIONS_UNREAD_COUNT: '/notifications/unread-count',
 };

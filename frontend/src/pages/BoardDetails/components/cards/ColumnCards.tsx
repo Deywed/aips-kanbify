@@ -36,7 +36,11 @@ const ColumnCards = ({ columnId, cards }: ColumnCardsProps) => {
           />
         ))}
 
-        <Button variant="ghost" onClick={() => setIsDialogOpen(true)}>
+        <Button
+          variant="ghost"
+          className="mt-auto"
+          onClick={() => setIsDialogOpen(true)}
+        >
           <HugeiconsIcon icon={Add01Icon} size={16} /> Add card
         </Button>
       </div>

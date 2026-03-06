@@ -30,13 +30,13 @@ import {
 
 const sidebarLinks = [
   { label: 'My Boards', to: APP_ROUTES.BOARDS, icon: DashboardSquare01Icon },
+  { label: 'Assigned Cards', to: APP_ROUTES.ASSIGNED_CARDS, icon: Task01Icon },
   {
     label: 'Notifications',
     to: APP_ROUTES.NOTIFICATIONS,
     icon: Notification02Icon,
   },
   { label: 'Profile', to: APP_ROUTES.USERS, icon: UserIcon },
-  { label: 'Assigned Cards', to: APP_ROUTES.ASSIGNED_CARDS, icon: Task01Icon },
 ];
 
 const LeftSidebar = () => {

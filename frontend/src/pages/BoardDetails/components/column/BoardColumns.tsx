@@ -80,12 +80,12 @@ const BoardColumns = ({ isError }: BoardColumnsProps) => {
                 );
               })}
 
-              <div
-                className="text-muted-foreground hover:bg-card/50 hover:text-foreground flex h-30 w-xs cursor-pointer items-center justify-center gap-2 rounded-md border shadow transition-colors hover:border-solid dark:border-dashed"
+              <Button
+                variant="outline"
                 onClick={() => setIsAddColumnOpen(true)}
               >
-                <HugeiconsIcon icon={Add01Icon} size={16} /> Add column
-              </div>
+                <HugeiconsIcon icon={Add01Icon} /> Add column
+              </Button>
             </div>
 
             <ScrollBar orientation="horizontal" />

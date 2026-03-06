@@ -53,7 +53,9 @@ export class CardHistory {
   @Column({ type: 'jsonb', nullable: true })
   payload: CardHistoryPayload;
 
-  @CreateDateColumn()
+  @CreateDateColumn({
+    type: 'timestamptz',
+  })
   createdAt: Date;
 
   @Index()
