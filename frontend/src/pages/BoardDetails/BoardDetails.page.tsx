@@ -14,9 +14,11 @@ import {
 } from '@/stores/board.store';
 
 import api from '@/lib/axios';
+import { chatStorage } from '@/lib/chatStorage';
 import { API_ENDPOINTS } from '@/config/endpoints';
 
 import { useBoardSocket } from '@/hooks/board/useBoardSocket';
+import { useAuthUser } from '@/stores/auth.store';
 
 import { type BoardDetails } from '@/types/board.types';
 
@@ -61,6 +63,7 @@ const BoardDetailsPage = () => {
   const currentUserRole = useUserBoardRole();
   const isChatOpen = useIsChatOpen();
   const unreadCount = useChatUnreadCount();
+  const currentUser = useAuthUser();
 
   const { data, isLoading, isError, isSuccess } = useQuery<BoardDetails>({
     queryKey: [API_ENDPOINTS.BOARD(boardId || '')],
@@ -71,15 +74,15 @@ const BoardDetailsPage = () => {
 
   // Fetch initial unread count
   useEffect(() => {
-    if (!boardId) return;
-    const lastSeenAt = localStorage.getItem(`chat_lastSeen_${boardId}`);
+    if (!boardId || !currentUser) return;
+    const lastSeenAt = chatStorage.getLastSeenAt(boardId, currentUser.id);
     api
       .get(API_ENDPOINTS.CHAT_UNREAD_COUNT(boardId), {
         params: lastSeenAt ? { lastSeenAt } : undefined,
       })
       .then(({ data }) => setUnreadCount(data.unreadCount))
       .catch(() => {});
-  }, [boardId, setUnreadCount]);
+  }, [boardId, currentUser, setUnreadCount]);
 
   // Sync loading state with React Query
   useEffect(() => {
@@ -149,12 +152,8 @@ const BoardDetailsPage = () => {
               variant="outline"
               className="relative"
               onClick={() => {
-                if (!isChatOpen && boardId) {
-                  // Mark as seen when opening
-                  localStorage.setItem(
-                    `chat_lastSeen_${boardId}`,
-                    new Date().toISOString(),
-                  );
+                if (!isChatOpen && boardId && currentUser) {
+                  chatStorage.updateLastSeenAt(boardId, currentUser.id);
                   setUnreadCount(0);
                 }
                 toggleChat();
@@ -187,11 +186,8 @@ const BoardDetailsPage = () => {
           <ChatPanel
             onClose={() => {
               setChatOpen(false);
-              if (boardId) {
-                localStorage.setItem(
-                  `chat_lastSeen_${boardId}`,
-                  new Date().toISOString(),
-                );
+              if (boardId && currentUser) {
+                chatStorage.updateLastSeenAt(boardId, currentUser.id);
               }
             }}
           />

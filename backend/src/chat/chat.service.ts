@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThan, MoreThan, Repository } from 'typeorm';
+import { LessThan, MoreThanOrEqual, Repository } from 'typeorm';
 
 import { ChatMessage } from './entity/chat-message.entity';
 import { SendMessageDto } from './dto/send-message.dto';
@@ -60,7 +60,9 @@ export class ChatService {
     return this.messageRepo.count({
       where: {
         board: { id: boardId },
-        createdAt: MoreThan(new Date(lastSeenAt)),
+        createdAt: MoreThanOrEqual(
+          new Date(new Date(lastSeenAt).getTime() + 1),
+        ),
       },
     });
   }
