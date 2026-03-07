@@ -24,4 +24,10 @@ export const joinBoardRoom = (boardId: string) =>
 export const leaveBoardRoom = (boardId: string) =>
   boardSocketManager.emit(SOCKET_EVENTS.BOARD.LEAVE, { boardId });
 
+export const sendChatMessage = (boardId: string, content: string) =>
+  boardSocketManager.emit(SOCKET_EVENTS.BOARD.CHAT_MESSAGE, {
+    boardId,
+    content,
+  });
+
 export const getBoardSocket = () => boardSocketManager.getSocket();
