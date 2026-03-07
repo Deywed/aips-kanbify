@@ -23,7 +23,7 @@ createRoot(document.getElementById('root')!).render(
           position="top-center"
           swipeDirections={['left', 'right', 'top']}
         />
-        {/* {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />} */}
+        {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
       </ThemeProvider>
     </ReactQueryProvider>
   </StrictMode>,

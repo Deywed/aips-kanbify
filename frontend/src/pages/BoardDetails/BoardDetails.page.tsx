@@ -103,6 +103,9 @@ const BoardDetailsPage = () => {
       queryClient.invalidateQueries({
         queryKey: [API_ENDPOINTS.BOARD(boardId || '')],
       });
+      queryClient.invalidateQueries({
+        queryKey: [API_ENDPOINTS.CHAT_MESSAGES(boardId || '')],
+      });
     };
   }, [boardId, queryClient, resetBoard, resetChat]);
 
