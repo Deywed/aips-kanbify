@@ -45,7 +45,7 @@ const ChatPanel = ({ onClose }: { onClose: () => void }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const isLoadingOlderRef = useRef(false);
-  const hasScrolledRef = useRef(false);
+  const initializedRef = useRef(false);
   const hadMessagesOnMount = useRef(messages.length > 0);
 
   const boardId = boardInfo.id;
@@ -129,20 +129,23 @@ const ChatPanel = ({ onClose }: { onClose: () => void }) => {
 
   // Scroll + sentinel aktivacija — okida se kada messages prvi put budu popunjeni
   useEffect(() => {
-    if (messages.length === 0 || hasScrolledRef.current) return;
-    hasScrolledRef.current = true;
+    if (messages.length === 0 || initializedRef.current) return;
+    initializedRef.current = true;
 
-    messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
-
-    const timeout = setTimeout(() => setIsSentinelActive(true), 100);
-    return () => clearTimeout(timeout);
+    // rAF osigurava da je ScrollArea viewport spreman
+    requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+      // Kraći delay — samo da IntersectionObserver ne uhvati sentinel odmah
+      const timeout = setTimeout(() => setIsSentinelActive(true), 50);
+      return () => clearTimeout(timeout); // ← ovo ne radi u rAF, vidi ispod
+    });
   }, [messages.length]);
 
   // Scroll za nove real-time poruke
   useEffect(() => {
-    if (!isSentinelActive) return;
+    if (!initializedRef.current) return; // nije ni inicijalizovano
 
-    const viewport = scrollAreaRef.current?.querySelector(
+    const viewport = scrollAreaRef.current?.querySelector<HTMLElement>(
       '[data-slot="scroll-area-viewport"]',
     );
     if (!viewport) return;
@@ -153,7 +156,7 @@ const ChatPanel = ({ onClose }: { onClose: () => void }) => {
     if (isNearBottom) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [isSentinelActive, messages.length]);
+  }, [messages.length]); // ← samo messages.length, ne isSentinelActive
 
   const handleSend = () => {
     const trimmed = input.trim();
