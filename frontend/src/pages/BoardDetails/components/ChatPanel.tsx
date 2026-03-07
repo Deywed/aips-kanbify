@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Cancel01Icon, SentIcon } from '@hugeicons/core-free-icons';
@@ -27,7 +28,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 import UserAvatar from '@/components/common/UserAvatar';
 import EmptyState from '@/components/common/EmptyState';
-import { useQuery } from '@tanstack/react-query';
 
 const CHAT_MESSAGES_LIMIT = 15;
 
@@ -111,7 +111,7 @@ const ChatPanel = ({ onClose }: { onClose: () => void }) => {
       },
     ],
     enabled: !!boardId,
-    staleTime: Infinity, // ne refetchuj, socket drži svježe
+    staleTime: 0,
   });
 
   useEffect(() => {

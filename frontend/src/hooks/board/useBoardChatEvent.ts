@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import type { Socket } from 'socket.io-client';
+import { toast } from 'sonner';
 
 import { SOCKET_EVENTS } from '@/config/socketEvents';
 
@@ -25,7 +26,6 @@ const useBoardChatEvent = (socket: Socket | null) => {
       if (message.sender.id === currentUser?.id) {
         // Always append own messages
         appendMessage(message);
-        // Update lastSeen so own messages don't count as unread on refresh
         if (boardId && currentUser) {
           chatStorage.updateLastSeenAt(
             boardId,
@@ -38,7 +38,6 @@ const useBoardChatEvent = (socket: Socket | null) => {
 
       if (isChatOpen) {
         appendMessage(message);
-        // Update lastSeen while reading in real-time
         if (boardId && currentUser) {
           chatStorage.updateLastSeenAt(
             boardId,
@@ -48,9 +47,13 @@ const useBoardChatEvent = (socket: Socket | null) => {
         }
       } else {
         incrementUnreadCount();
+        toast.message(`New message from @${message.sender.username}`, {
+          description: message.content,
+          descriptionClassName: 'line-clamp-2',
+        });
       }
     },
-    [appendMessage, incrementUnreadCount, currentUser],
+    [currentUser, appendMessage, incrementUnreadCount],
   );
 
   useSocketSubscription(
