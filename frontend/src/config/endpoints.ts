@@ -41,4 +41,7 @@ export const API_ENDPOINTS = {
   GET_CARD_HISTORY: (cardId: string) => `/cards/${cardId}/history`,
 
   NOTIFICATIONS_UNREAD_COUNT: '/notifications/unread-count',
+
+  CHAT_MESSAGES: (boardId: string) => `/board/${boardId}/chat/messages`,
+  CHAT_UNREAD_COUNT: (boardId: string) => `/board/${boardId}/chat/unread-count`,
 };
