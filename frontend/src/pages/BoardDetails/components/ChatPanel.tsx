@@ -46,6 +46,7 @@ const ChatPanel = ({ onClose }: { onClose: () => void }) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const isLoadingOlderRef = useRef(false);
   const hasScrolledRef = useRef(false);
+  const hadMessagesOnMount = useRef(messages.length > 0);
 
   const boardId = boardInfo.id;
 
@@ -93,11 +94,17 @@ const ChatPanel = ({ onClose }: { onClose: () => void }) => {
     }
   }, [boardId, hasMore, messages, prependMessages, setHasMore]);
 
+  const loadOlderRef = useRef(loadOlder);
+
+  useEffect(() => {
+    loadOlderRef.current = loadOlder;
+  }, [loadOlder]);
+
   const { ref: topSentinelRef } = useInView({
     threshold: 0,
     skip: !isSentinelActive,
     onChange: (inView) => {
-      if (inView) loadOlder();
+      if (inView) loadOlderRef.current();
     },
   });
 
@@ -110,12 +117,12 @@ const ChatPanel = ({ onClose }: { onClose: () => void }) => {
         limit: CHAT_MESSAGES_LIMIT,
       },
     ],
-    enabled: !!boardId,
-    staleTime: 0,
+    staleTime: Infinity,
+    enabled: !!boardId && !hadMessagesOnMount.current,
   });
 
   useEffect(() => {
-    if (!initialMessages) return;
+    if (!initialMessages || hadMessagesOnMount.current) return;
     setMessages(initialMessages.slice().reverse());
     setHasMore(initialMessages.length === CHAT_MESSAGES_LIMIT);
   }, [initialMessages, setMessages, setHasMore]);

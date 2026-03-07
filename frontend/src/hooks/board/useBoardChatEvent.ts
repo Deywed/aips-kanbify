@@ -20,7 +20,7 @@ const useBoardChatEvent = (socket: Socket | null) => {
 
   const handleChatMessage = useCallback(
     (message: ChatMessage) => {
-      const { isChatOpen, board } = useBoardStore.getState();
+      const { isChatOpen, board, messages } = useBoardStore.getState();
       const boardId = board?.id;
 
       if (message.sender.id === currentUser?.id) {
@@ -46,10 +46,17 @@ const useBoardChatEvent = (socket: Socket | null) => {
           );
         }
       } else {
-        incrementUnreadCount();
+        // Store has messages from a previous open – keep them in sync
+        if (messages.length > 0) {
+          appendMessage(message);
+        } else {
+          // No messages yet – just track count, first open will fetch
+          incrementUnreadCount();
+        }
         toast.message(`New message from @${message.sender.username}`, {
           description: message.content,
           descriptionClassName: 'line-clamp-2',
+          duration: 2500,
         });
       }
     },
