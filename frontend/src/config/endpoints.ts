@@ -40,6 +40,7 @@ export const API_ENDPOINTS = {
     `/board/${boardId}/columns/${columnId}/cards/${cardId}/move`,
   GET_CARD_HISTORY: (cardId: string) => `/cards/${cardId}/history`,
 
+  NOTIFICATIONS: '/notifications',
   NOTIFICATIONS_UNREAD_COUNT: '/notifications/unread-count',
 
   CHAT_MESSAGES: (boardId: string) => `/board/${boardId}/chat/messages`,
