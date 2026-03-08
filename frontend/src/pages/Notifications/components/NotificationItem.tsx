@@ -44,7 +44,7 @@ const NotificationItem = ({ notification, isLast }: NotificationItemProps) => {
       <div className="group flex gap-4 p-4">
         <UserAvatar user={notification.triggeredBy} link />
 
-        <div className="flex flex-1 flex-col gap-2">
+        <div className="flex flex-1 flex-col gap-1">
           <div className="flex items-center gap-2">
             <Badge variant="default">
               <HugeiconsIcon icon={meta.icon} />
@@ -56,7 +56,7 @@ const NotificationItem = ({ notification, isLast }: NotificationItemProps) => {
             <Button
               size="icon"
               variant="destructive"
-              className="ml-auto opacity-0 transition-opacity group-hover:opacity-100"
+              className="ml-auto transition-opacity group-hover:opacity-100 md:opacity-0"
               onClick={() => setIsDeleteDialogOpen(true)}
             >
               <HugeiconsIcon icon={Delete02Icon} />

@@ -84,6 +84,8 @@ const PaginationBar = ({
       setSearchParam(SEARCH_PARAMS.PAGE, page.toString());
     }
 
+    document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
+
     onPageChange?.(page);
   };
 
