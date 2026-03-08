@@ -33,7 +33,7 @@ export class NotificationsService {
     });
 
     return {
-      data,
+      items: data,
       total,
       page,
       pageSize,

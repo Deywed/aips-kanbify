@@ -22,7 +22,7 @@ const AppLayout = () => {
     <SidebarProvider className="flex">
       <LeftSidebar />
 
-      <main className="flex h-screen min-w-0 flex-1 flex-col overflow-hidden">
+      <main className="flex h-screen min-w-0 flex-1 flex-col">
         <Outlet />
       </main>
     </SidebarProvider>

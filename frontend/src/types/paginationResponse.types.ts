@@ -1,5 +1,5 @@
 export type PaginationResponse<T> = {
-  data: T[];
+  items: T[];
   total: number;
   page: number;
   pageSize: number;
