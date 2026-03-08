@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { API_ENDPOINTS } from '@/config/endpoints';
@@ -19,6 +19,8 @@ import Header from '@/components/common/Header';
 import PaginationBar from '@/components/common/PaginationBar';
 import BlockUI from '@/components/common/BlockUI';
 
+import NotificationList from './components/NotificationList';
+
 const NotificationsPage = () => {
   const { getSearchParam } = useSearchParams();
   const { resetUnread } = useNotificationsActions();
@@ -33,6 +35,7 @@ const NotificationsPage = () => {
         page: getSearchParam(SEARCH_PARAMS.PAGE) || '1',
       },
     ],
+    placeholderData: keepPreviousData,
   });
 
   useEffect(() => {
@@ -53,8 +56,7 @@ const NotificationsPage = () => {
         isEmpty={data?.items.length === 0}
         className="p-4"
       >
-        ...
-        {/* TODO display notification list here */}
+        <NotificationList notifications={data?.items ?? []} />
       </BlockUI>
 
       {data && (

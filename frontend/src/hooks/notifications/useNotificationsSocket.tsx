@@ -60,6 +60,9 @@ export const useNotificationsSocket = () => {
       queryClient.invalidateQueries({
         queryKey: [API_ENDPOINTS.BOARDS],
       });
+      queryClient.invalidateQueries({
+        queryKey: [API_ENDPOINTS.NOTIFICATIONS],
+      });
     });
 
     return () => {
