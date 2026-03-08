@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Cancel01Icon, SentIcon } from '@hugeicons/core-free-icons';
+import { Cancel01Icon } from '@hugeicons/core-free-icons';
 
 import api from '@/lib/axios';
 import { sendChatMessage } from '@/lib/sockets/boardSocket';
@@ -23,11 +23,11 @@ import type { ChatMessage } from '@/types/chat.types';
 import H4 from '@/components/ui/typography/H4';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 import UserAvatar from '@/components/common/UserAvatar';
 import EmptyState from '@/components/common/EmptyState';
+import ChatInput from './ChatInput';
 
 const CHAT_MESSAGES_LIMIT = 15;
 
@@ -38,7 +38,6 @@ const ChatPanel = ({ onClose }: { onClose: () => void }) => {
   const { setMessages, prependMessages, setHasMore } = useBoardActions();
   const currentUser = useAuthUser();
 
-  const [input, setInput] = useState('');
   const [isLoadingOlder, setIsLoadingOlder] = useState(false);
   const [isSentinelActive, setIsSentinelActive] = useState(false);
 
@@ -135,15 +134,14 @@ const ChatPanel = ({ onClose }: { onClose: () => void }) => {
     // rAF osigurava da je ScrollArea viewport spreman
     requestAnimationFrame(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
-      // Kraći delay — samo da IntersectionObserver ne uhvati sentinel odmah
       const timeout = setTimeout(() => setIsSentinelActive(true), 50);
-      return () => clearTimeout(timeout); // ← ovo ne radi u rAF, vidi ispod
+      return () => clearTimeout(timeout);
     });
   }, [messages.length]);
 
   // Scroll za nove real-time poruke
   useEffect(() => {
-    if (!initializedRef.current) return; // nije ni inicijalizovano
+    if (!initializedRef.current) return;
 
     const viewport = scrollAreaRef.current?.querySelector<HTMLElement>(
       '[data-slot="scroll-area-viewport"]',
@@ -156,21 +154,15 @@ const ChatPanel = ({ onClose }: { onClose: () => void }) => {
     if (isNearBottom) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages.length]); // ← samo messages.length, ne isSentinelActive
+  }, [messages.length]);
 
-  const handleSend = () => {
-    const trimmed = input.trim();
-    if (!trimmed || !boardId) return;
-    sendChatMessage(boardId, trimmed);
-    setInput('');
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
+  const handleSend = useCallback(
+    (message: string) => {
+      if (!boardId) return;
+      sendChatMessage(boardId, message);
+    },
+    [boardId],
+  );
 
   return (
     <div className="bg-background flex h-full w-84 shrink-0 flex-col border-l">
@@ -243,26 +235,7 @@ const ChatPanel = ({ onClose }: { onClose: () => void }) => {
         </div>
       </ScrollArea>
 
-      {/* Input */}
-      <form className="flex items-center gap-2 border-t p-4">
-        <Input
-          placeholder="Type a message..."
-          className="flex-1"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          maxLength={2000}
-        />
-        <Button
-          size="icon"
-          variant="outline"
-          type="submit"
-          onClick={handleSend}
-          disabled={!input.trim()}
-        >
-          <HugeiconsIcon icon={SentIcon} />
-        </Button>
-      </form>
+      <ChatInput onSend={handleSend} />
     </div>
   );
 };

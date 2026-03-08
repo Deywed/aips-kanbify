@@ -25,6 +25,7 @@ import { type BoardDetails } from '@/types/board.types';
 import { Skeleton } from '@/components/ui/skeleton';
 import H3 from '@/components/ui/typography/H3';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Tooltip,
   TooltipContent,
@@ -39,8 +40,8 @@ import { BoardAdminGuard } from '@/components/guards/BoardAdminGuard';
 import BoardMembersDrawer from './components/BoardMembersDrawer';
 import BoardColumns from './components/column/BoardColumns';
 import BoardFilters from './components/board-filters/BoardFilters';
-import ChatPanel from './components/ChatPanel';
-import { Badge } from '@/components/ui/badge';
+
+import ChatPanel from './components/chat/ChatPanel';
 
 const BoardDetailsPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
