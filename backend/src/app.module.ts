@@ -15,6 +15,7 @@ import { TagModule } from './tag/tag.module';
 import { CardHistoryModule } from './card-history/card-history.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { UsersModule } from './users/users.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { UsersModule } from './users/users.module';
     CardHistoryModule,
     NotificationsModule,
     UsersModule,
+    ChatModule,
   ],
   controllers: [],
   providers: [],

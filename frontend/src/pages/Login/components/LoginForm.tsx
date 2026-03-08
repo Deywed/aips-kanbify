@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
 
 import { useAuthActions } from '@/stores/auth.store';
 
@@ -36,7 +35,6 @@ const LoginForm = () => {
         setAccessToken(response.accessToken);
         setUser(response.user);
 
-        toast.success('Login successful!');
         navigate('/boards');
       },
     });

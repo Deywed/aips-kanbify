@@ -1,3 +1,4 @@
+import type { ChatMessage } from '@/types/chat.types';
 import type { BoardMember } from '@/types/auth.types';
 import type {
   BoardDetails,
@@ -50,8 +51,25 @@ export type BoardCardsSlice = {
   ) => void;
 };
 
+export type BoardChatSlice = {
+  isChatOpen: boolean;
+  unreadCount: number;
+  messages: ChatMessage[];
+  hasMore: boolean;
+  toggleChat: () => void;
+  setChatOpen: (open: boolean) => void;
+  setUnreadCount: (count: number) => void;
+  incrementUnreadCount: () => void;
+  setMessages: (messages: ChatMessage[]) => void;
+  prependMessages: (messages: ChatMessage[]) => void;
+  appendMessage: (message: ChatMessage) => void;
+  setHasMore: (hasMore: boolean) => void;
+  resetChat: () => void;
+};
+
 export type BoardState = BoardCoreSlice &
   BoardMembersSlice &
   BoardColumnsSlice &
   BoardTagsSlice &
-  BoardCardsSlice;
+  BoardCardsSlice &
+  BoardChatSlice;

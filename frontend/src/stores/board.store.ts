@@ -9,6 +9,7 @@ import {
   createBoardCoreSlice,
   createBoardMembersSlice,
   createBoardTagsSlice,
+  createBoardChatSlice,
 } from './board';
 
 const EMPTY_MEMBERS: BoardMember[] = [];
@@ -21,6 +22,7 @@ export const useBoardStore = create<BoardState>((...a) => ({
   ...createBoardColumnsSlice(...a),
   ...createBoardTagsSlice(...a),
   ...createBoardCardsSlice(...a),
+  ...createBoardChatSlice(...a),
 }));
 
 // Custom hooks
@@ -48,6 +50,15 @@ export const useUserBoardRole = () =>
 export const useIsBoardLoading = () =>
   useBoardStore((state) => state.isLoading);
 
+export const useIsChatOpen = () => useBoardStore((state) => state.isChatOpen);
+
+export const useChatUnreadCount = () =>
+  useBoardStore((state) => state.unreadCount);
+
+export const useChatMessages = () => useBoardStore((state) => state.messages);
+
+export const useChatHasMore = () => useBoardStore((state) => state.hasMore);
+
 // TODO: later should split into separate hooks for each slice (e.g. useBoardMembersActions, useBoardColumnsActions, etc.)
 export const useBoardActions = () =>
   useBoardStore(
@@ -69,5 +80,14 @@ export const useBoardActions = () =>
       deleteCard: state.deleteCard,
       moveCard: state.moveCard,
       resetBoard: state.resetBoard,
+      toggleChat: state.toggleChat,
+      setChatOpen: state.setChatOpen,
+      setUnreadCount: state.setUnreadCount,
+      incrementUnreadCount: state.incrementUnreadCount,
+      setMessages: state.setMessages,
+      prependMessages: state.prependMessages,
+      appendMessage: state.appendMessage,
+      setHasMore: state.setHasMore,
+      resetChat: state.resetChat,
     })),
   );

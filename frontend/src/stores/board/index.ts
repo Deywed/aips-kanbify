@@ -3,6 +3,7 @@ export { createBoardMembersSlice } from './members.slice';
 export { createBoardColumnsSlice } from './columns.slice';
 export { createBoardTagsSlice } from './tags.slice';
 export { createBoardCardsSlice } from './cards.slice';
+export { createBoardChatSlice } from './chat.slice';
 
 export type {
   BoardCoreSlice,
@@ -10,5 +11,6 @@ export type {
   BoardColumnsSlice,
   BoardTagsSlice,
   BoardCardsSlice,
+  BoardChatSlice,
   BoardState,
 } from './types';
