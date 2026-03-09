@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Add01Icon } from '@hugeicons/core-free-icons';
 import { DragDropProvider } from '@dnd-kit/react';
 
 import type { Card } from '@/types/board.types';
+
+import { SEARCH_PARAMS } from '@/config/searchParams';
+import useSearchParams from '@/hooks/useSearchParams';
 
 import { useBoardColumns, useIsBoardLoading } from '@/stores/board.store';
 
@@ -27,6 +30,10 @@ const BoardColumns = ({ isError }: BoardColumnsProps) => {
 
   const boardColumns = useBoardColumns();
   const isBoardLoading = useIsBoardLoading();
+  const { getSearchParam } = useSearchParams();
+
+  const searchQuery = getSearchParam(SEARCH_PARAMS.QUERY)?.toLowerCase() ?? '';
+  const filterUserId = getSearchParam(SEARCH_PARAMS.USER_ID);
 
   const {
     cardItems,
@@ -37,6 +44,31 @@ const BoardColumns = ({ isError }: BoardColumnsProps) => {
     handleDragOver,
     handleDragEnd,
   } = useBoardDragDrop(boardColumns);
+
+  const hasFilters = searchQuery !== '' || !!filterUserId;
+
+  const filteredCardsMap = useMemo(() => {
+    if (!hasFilters) return null;
+
+    const matchesCard = (card: Card) => {
+      if (filterUserId && card.assignedTo?.id !== filterUserId) return false;
+      if (searchQuery) {
+        const inTitle = card.title.toLowerCase().includes(searchQuery);
+        const inDesc = card.description?.toLowerCase().includes(searchQuery);
+        const inTag = card.tags.some((t) =>
+          t.name.toLowerCase().includes(searchQuery),
+        );
+        if (!inTitle && !inDesc && !inTag) return false;
+      }
+      return true;
+    };
+
+    const map = new Map<string, boolean>();
+    for (const [, card] of cardsMap) {
+      map.set(card.id, matchesCard(card));
+    }
+    return map;
+  }, [hasFilters, filterUserId, searchQuery, cardsMap]);
 
   return (
     <>
@@ -68,14 +100,20 @@ const BoardColumns = ({ isError }: BoardColumnsProps) => {
                   .map((cardId) => cardsMap.get(cardId))
                   .filter(Boolean) as Card[];
 
+                const visibleCards = filteredCardsMap
+                  ? orderedCards.filter(
+                      (card) => filteredCardsMap.get(card.id) ?? false,
+                    )
+                  : orderedCards;
+
                 return (
                   <SortableColumn
                     key={column.id}
                     column={column}
-                    cardCount={orderedCards.length}
+                    cardCount={visibleCards.length}
                     index={colIndex}
                   >
-                    <ColumnCards columnId={column.id} cards={orderedCards} />
+                    <ColumnCards columnId={column.id} cards={visibleCards} />
                   </SortableColumn>
                 );
               })}

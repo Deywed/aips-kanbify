@@ -48,4 +48,6 @@ export const API_ENDPOINTS = {
 
   CHAT_MESSAGES: (boardId: string) => `/board/${boardId}/chat/messages`,
   CHAT_UNREAD_COUNT: (boardId: string) => `/board/${boardId}/chat/unread-count`,
+
+  ASSIGNED_CARDS: '/users/assigned-cards',
 };

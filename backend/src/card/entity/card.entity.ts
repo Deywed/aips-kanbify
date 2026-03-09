@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinTable,
   ManyToMany,
   ManyToOne,
@@ -16,6 +17,8 @@ import { CardHistory } from 'src/card-history/entity/card-history.entity';
 import { Tag } from 'src/tag/entity/tag.entity';
 
 @Entity('cards')
+@Index('IDX_cards_column_position', ['column', 'position'])
+@Index('IDX_cards_assignedTo_createdAt', ['assignedTo', 'createdAt'])
 export class Card {
   @PrimaryGeneratedColumn('uuid')
   id: string;
