@@ -178,7 +178,8 @@ const BoardDetailsPage = () => {
         <div className="flex min-w-0 flex-1 flex-col gap-4 overflow-hidden p-4">
           {isLoading ? (
             <div className="flex items-center gap-2">
-              <Skeleton className="h-9 w-53" />
+              <Skeleton className="h-9 w-3xs" />
+              <Skeleton className="h-9 w-3xs" />
               <Skeleton className="h-9 w-18" />
             </div>
           ) : (
