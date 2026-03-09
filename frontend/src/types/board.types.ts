@@ -44,6 +44,8 @@ export type Card = {
   tags: Tag[];
 };
 
+export type CardWithBoard = Card & { board: BoardBase };
+
 export type Tag = {
   id: string;
   name: string;

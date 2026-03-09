@@ -372,7 +372,7 @@ export class CardService {
 
     const [cards, total] = await this.cardRepo.findAndCount({
       where: { assignedTo: { id: userId } },
-      relations: ['column.board', 'tags'],
+      relations: ['column.board', 'tags', 'createdBy'],
       order: { createdAt: 'DESC' },
       skip: (page - 1) * pageSize,
       take: pageSize,

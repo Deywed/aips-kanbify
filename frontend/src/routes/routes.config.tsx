@@ -15,6 +15,7 @@ import BoardsPage from '@/pages/Boards';
 import BoardDetailsPage from '@/pages/BoardDetails';
 import ProfilePage from '@/pages/Profile';
 import NotificationsPage from '@/pages/Notifications';
+import AssignedCardsPage from '@/pages/AssignedCards';
 
 export const router = createBrowserRouter([
   {
@@ -43,6 +44,7 @@ export const router = createBrowserRouter([
           { path: '/boards/:boardId', element: <BoardDetailsPage /> },
           { path: '/users/:id', element: <ProfilePage /> },
           { path: '/notifications', element: <NotificationsPage /> },
+          { path: '/assigned-cards', element: <AssignedCardsPage /> },
         ],
       },
     ],
