@@ -367,7 +367,7 @@ export class CardService {
   async getUsersAssignedCards(
     userId: string,
     query: PaginationQueryDto,
-  ): Promise<PaginatedResponse<Card>> {
+  ): Promise<PaginatedResponse<Omit<Card, 'column'>>> {
     const { page = 1, pageSize = 10 } = query;
 
     const [cards, total] = await this.cardRepo.findAndCount({
@@ -379,7 +379,11 @@ export class CardService {
     });
 
     return {
-      items: cards,
+      items: cards.map((card) => ({
+        ...card,
+        board: card.column.board,
+        column: undefined,
+      })),
       total,
       page,
       pageSize,
