@@ -48,6 +48,20 @@ const useBoardColumnCardEvent = (socket: Socket | null) => {
     [currentUser?.id, deleteCard],
   );
 
+  const handleCardMoved = useCallback(
+    (payload: CardMovedPayload) => {
+      if (payload.actorId !== currentUser?.id) {
+        moveCard(
+          payload.oldColumnId,
+          payload.newColumnId,
+          payload.cardId,
+          payload.card,
+        );
+      }
+    },
+    [moveCard, currentUser?.id],
+  );
+
   useSocketSubscription(
     socket,
     SOCKET_EVENTS.BOARD.COLUMN_CARD_CREATED,
@@ -64,20 +78,6 @@ const useBoardColumnCardEvent = (socket: Socket | null) => {
     socket,
     SOCKET_EVENTS.BOARD.COLUMN_CARD_DELETED,
     handleCardDeleted,
-  );
-
-  const handleCardMoved = useCallback(
-    (payload: CardMovedPayload) => {
-      if (payload.actorId !== currentUser?.id) {
-        moveCard(
-          payload.oldColumnId,
-          payload.newColumnId,
-          payload.cardId,
-          payload.card,
-        );
-      }
-    },
-    [moveCard, currentUser?.id],
   );
 
   useSocketSubscription(

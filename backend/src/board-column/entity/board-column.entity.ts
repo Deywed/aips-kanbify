@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -12,6 +13,7 @@ import { Board } from 'src/board/entity/board.entity';
 import { Card } from 'src/card/entity/card.entity';
 
 @Entity('board_columns')
+@Index('IDX_board_columns_board_position', ['board', 'position'])
 export class BoardColumn {
   @PrimaryGeneratedColumn('uuid')
   id: string;

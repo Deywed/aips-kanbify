@@ -14,9 +14,15 @@ import { Server, Socket } from 'socket.io';
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
 import { BoardRoleGuard } from 'src/common/guards/board-role.guard';
 import { SOCKET_EVENTS } from 'src/common/constants/socket-events.constants';
+import { ChatService } from 'src/chat/chat.service';
 
 type BoardRoomPayload = {
   boardId: string;
+};
+
+type ChatMessagePayload = {
+  boardId: string;
+  content: string;
 };
 
 @WebSocketGateway({
@@ -32,7 +38,10 @@ export class BoardGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private readonly logger = new Logger(BoardGateway.name);
 
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private chatService: ChatService,
+  ) {}
 
   async handleConnection(client: Socket) {
     const token = client.handshake.auth?.token;
@@ -100,6 +109,43 @@ export class BoardGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.leave(room);
 
     return { ok: true, boardId };
+  }
+
+  @UseGuards(BoardRoleGuard)
+  @SubscribeMessage(SOCKET_EVENTS.BOARD.CHAT_MESSAGE)
+  async handleChatMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: ChatMessagePayload,
+  ) {
+    const userId = client.data?.userId as string | undefined;
+    const { boardId, content } = payload ?? {};
+
+    if (!userId) {
+      return { ok: false, reason: 'Unauthorized' };
+    }
+
+    if (!boardId || !content?.trim()) {
+      return { ok: false, reason: 'Missing boardId or content' };
+    }
+
+    if (content.length > 2000) {
+      return { ok: false, reason: 'Message too long' };
+    }
+
+    try {
+      const message = await this.chatService.createMessage(boardId, userId, {
+        content: content.trim(),
+      });
+
+      this.server
+        .to(this.getBoardRoom(boardId))
+        .emit(SOCKET_EVENTS.BOARD.CHAT_MESSAGE, message);
+
+      return { ok: true, message };
+    } catch (error) {
+      this.logger.error('Failed to save chat message:', error.message);
+      return { ok: false, reason: 'Failed to send message' };
+    }
   }
 
   emitToBoard(boardId: string, event: string, data: unknown) {

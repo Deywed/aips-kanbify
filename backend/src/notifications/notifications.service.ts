@@ -8,12 +8,38 @@ import { Repository } from 'typeorm';
 
 import { Notification } from './entity/notifications.entity';
 
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { PaginatedResponse } from 'src/common/interfaces/paginated-response.interface';
+
 @Injectable()
 export class NotificationsService {
   constructor(
     @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
   ) {}
+
+  async getNotifications(
+    userId: string,
+    paginationQuery: PaginationQueryDto,
+  ): Promise<PaginatedResponse<Notification>> {
+    const { page = 1, pageSize = 10 } = paginationQuery;
+
+    const [data, total] = await this.notificationRepository.findAndCount({
+      where: { user: { id: userId } },
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      relations: ['triggeredBy', 'board', 'card'],
+    });
+
+    return {
+      items: data,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
+  }
 
   getUnreadNotificationsCount(userId: string) {
     return this.notificationRepository.count({

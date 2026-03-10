@@ -11,6 +11,8 @@ import {
 } from '@nestjs/common';
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
 
+import { BoardRole } from 'src/board-members/entity/board-members.entity';
+import { BoardRoleDecorator } from 'src/common/decorators/board-role.decorator';
 import { BoardRoleGuard } from 'src/common/guards/board-role.guard';
 
 import { CardService } from './card.service';
@@ -36,6 +38,7 @@ export class CardController {
   }
 
   @Delete(':cardId')
+  @BoardRoleDecorator(BoardRole.ADMIN)
   removeCard(
     @Req() req: Request,
     @Param('boardId', ParseUUIDPipe) boardId: string,

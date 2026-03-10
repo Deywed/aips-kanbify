@@ -38,6 +38,16 @@ export const API_ENDPOINTS = {
     `/board/${boardId}/columns/${columnId}/cards/${cardId}`,
   MOVE_CARD: (boardId: string, columnId: string, cardId: string) =>
     `/board/${boardId}/columns/${columnId}/cards/${cardId}/move`,
+  GET_CARD_HISTORY: (cardId: string) => `/cards/${cardId}/history`,
 
+  NOTIFICATIONS: '/notifications',
   NOTIFICATIONS_UNREAD_COUNT: '/notifications/unread-count',
+  MARK_ALL_NOTIFICATIONS_AS_READ: '/notifications/mark-all-as-read',
+  DELETE_NOTIFICATION: (notificationId: string) =>
+    `/notifications/${notificationId}`,
+
+  CHAT_MESSAGES: (boardId: string) => `/board/${boardId}/chat/messages`,
+  CHAT_UNREAD_COUNT: (boardId: string) => `/board/${boardId}/chat/unread-count`,
+
+  ASSIGNED_CARDS: '/users/assigned-cards',
 };

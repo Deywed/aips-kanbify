@@ -23,5 +23,7 @@ export const SOCKET_EVENTS = {
     COLUMN_CARD_UPDATED: 'board:columnCardUpdated',
     COLUMN_CARD_DELETED: 'board:columnCardDeleted',
     COLUMN_CARD_MOVED: 'board:columnCardMoved',
+
+    CHAT_MESSAGE: 'board:chatMessage',
   },
 } as const;

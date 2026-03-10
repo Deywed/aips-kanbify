@@ -14,10 +14,11 @@ import { POSITION_GAP } from 'src/common/constants/positions.constant';
 import { BoardColumnService } from 'src/board-column/board-column.service';
 import { BoardMembersService } from 'src/board-members/board-members.service';
 
-import { Board } from 'src/board/entity/board.entity';
 import { BoardColumn } from 'src/board-column/entity/board-column.entity';
 import { Card } from './entity/card.entity';
 
+import { PaginatedResponse } from 'src/common/interfaces/paginated-response.interface';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { MoveCardDto } from './dto/move-card.dto';
@@ -34,8 +35,6 @@ export class CardService {
   constructor(
     @InjectRepository(Card)
     private readonly cardRepo: Repository<Card>,
-    @InjectRepository(Board)
-    private readonly boardRepo: Repository<Board>,
     @InjectRepository(BoardColumn)
     private readonly columnRepo: Repository<BoardColumn>,
     private readonly boardColumnService: BoardColumnService,
@@ -285,6 +284,8 @@ export class CardService {
       throw new BadRequestException('Cannot move card after itself');
     }
 
+    const oldColumnName = card.column.title;
+
     let newPosition: number;
 
     if (!dto.afterCardId) {
@@ -347,6 +348,8 @@ export class CardService {
           boardId,
           columnId,
           dto.newColumnId,
+          oldColumnName,
+          newColumn.title,
           cardId,
           newPosition,
           movedCard,
@@ -359,5 +362,32 @@ export class CardService {
       console.error('Move Card Error:', error);
       throw new InternalServerErrorException('Failed to move card');
     }
+  }
+
+  async getUsersAssignedCards(
+    userId: string,
+    query: PaginationQueryDto,
+  ): Promise<PaginatedResponse<Omit<Card, 'column'>>> {
+    const { page = 1, pageSize = 10 } = query;
+
+    const [cards, total] = await this.cardRepo.findAndCount({
+      where: { assignedTo: { id: userId } },
+      relations: ['column.board', 'tags', 'createdBy'],
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    });
+
+    return {
+      items: cards.map((card) => ({
+        ...card,
+        board: card.column.board,
+        column: undefined,
+      })),
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
   }
 }

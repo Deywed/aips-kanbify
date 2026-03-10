@@ -14,6 +14,7 @@ import useBoardColumnEvent from './useBoardColumnEvent';
 import useBoardMemberEvent from './useBoardMemberEvent';
 import useBoardTagEvent from './useBoardTagEvent';
 import useBoardColumnCardEvent from './useBoardColumnCardEvent';
+import useBoardChatEvent from './useBoardChatEvent';
 
 export const useBoardSocket = (boardId?: string) => {
   const token = useAccessToken();
@@ -24,6 +25,7 @@ export const useBoardSocket = (boardId?: string) => {
   useBoardColumnEvent(socket);
   useBoardTagEvent(socket);
   useBoardColumnCardEvent(socket);
+  useBoardChatEvent(socket);
 
   useEffect(() => {
     if (!token || !boardId) return;
