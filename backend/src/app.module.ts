@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventEmitterModule } from '@nestjs/event-emitter/dist/event-emitter.module';
 import { createTypeOrmOptions } from './database/typeorm.config';
+import { HealthController } from './health.controller';
 
 import { JwtGlobalModule } from './jwt/jwt.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
@@ -46,7 +47,7 @@ import { ChatModule } from './chat/chat.module';
     UsersModule,
     ChatModule,
   ],
-  controllers: [],
+  controllers: [HealthController],
   providers: [],
 })
 export class AppModule {}
